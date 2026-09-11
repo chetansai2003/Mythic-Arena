@@ -1,11 +1,11 @@
 FROM node:22.17.0-bookworm-slim
 WORKDIR /app
 COPY package*.json ./
-COPY apps/web/package.json apps/web/package.json
-COPY apps/api/package.json apps/api/package.json
-COPY apps/worker/package.json apps/worker/package.json
+COPY frontend/package.json frontend/package.json
+COPY backend/package.json backend/package.json
+COPY backend/src/workers/package.json backend/src/workers/package.json
 COPY packages/shared/package.json packages/shared/package.json
-COPY packages/game-engine/package.json packages/game-engine/package.json
+COPY backend/src/services/gameEngine/package.json backend/src/services/gameEngine/package.json
 RUN npm ci
 COPY . .
 RUN npm run build

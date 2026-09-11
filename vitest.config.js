@@ -7,18 +7,14 @@ export default defineConfig({
         test: {
           name: 'node',
           environment: 'node',
-          include: [
-            'packages/**/*.test.js',
-            'apps/api/**/*.test.js',
-            'apps/worker/**/*.test.js',
-          ],
+          include: ['packages/**/*.test.js', 'backend/**/*.test.js'],
         },
       },
       {
         test: {
           name: 'web',
           environment: 'jsdom',
-          include: ['apps/web/**/*.test.{js,jsx}'],
+          include: ['frontend/**/*.test.{js,jsx}'],
           setupFiles: ['./tests/setup-web.js'],
         },
         oxc: { jsx: { runtime: 'automatic' } },

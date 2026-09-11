@@ -316,15 +316,72 @@ export const serverEventSchemas = Object.freeze({
 });
 
 // Part 2 identity and content boundaries.
-export const emailSchema = z.string().trim().toLowerCase().pipe(z.email().max(254));
-export const passwordSchema = z.string().min(12, 'Use at least 12 characters').max(128, 'Use at most 128 characters');
-export const registerSchema = z.strictObject({ email: emailSchema, password: passwordSchema, displayName: z.string().trim().min(2).max(40) });
-export const loginSchema = z.strictObject({ email: emailSchema, password: z.string().min(1).max(128) });
-export const profileSchema = z.strictObject({ id: idSchema, email: emailSchema, displayName: z.string().min(2).max(40), createdAt: z.iso.datetime() });
-export const authResponseSchema = z.strictObject({ user: profileSchema, accessToken: z.string().min(1), expiresAt: timestamp });
+export const emailSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .pipe(z.email().max(254));
+export const passwordSchema = z
+  .string()
+  .min(12, 'Use at least 12 characters')
+  .max(128, 'Use at most 128 characters');
+export const registerSchema = z.strictObject({
+  email: emailSchema,
+  password: passwordSchema,
+  displayName: z.string().trim().min(2).max(40),
+});
+export const loginSchema = z.strictObject({
+  email: emailSchema,
+  password: z.string().min(1).max(128),
+});
+export const profileSchema = z.strictObject({
+  id: idSchema,
+  email: emailSchema,
+  displayName: z.string().min(2).max(40),
+  createdAt: z.iso.datetime(),
+});
+export const authResponseSchema = z.strictObject({
+  user: profileSchema,
+  accessToken: z.string().min(1),
+  expiresAt: timestamp,
+});
 export const deckCreateSchema = playableDeckSchema;
-export const deckUpdateSchema = z.strictObject({ name: z.string().trim().min(1).max(60).optional(), cardIds: z.array(idSchema).max(LIMITS.deck).optional(), expectedRevision: z.number().int().positive() }).refine((data) => data.name !== undefined || data.cardIds !== undefined, 'Provide a name or card list');
-export const deckDeleteSchema = z.strictObject({ expectedRevision: z.number().int().positive() });
-export const savedDeckSchema = z.strictObject({ id: idSchema, name: z.string().min(1).max(60), cardIds: z.array(idSchema).length(LIMITS.deck), revision: z.number().int().positive(), rulesVersion: z.literal(RULES_VERSION), catalogVersion: z.literal(1), valid: z.literal(true), playable: z.boolean(), createdAt: z.iso.datetime(), updatedAt: z.iso.datetime() });
-export const deckListSchema = z.strictObject({ decks: z.array(savedDeckSchema) });
-export const catalogResponseSchema = z.strictObject({ rulesVersion: z.literal(RULES_VERSION), catalogVersion: z.literal(1), cards: z.array(z.strictObject({ definition: cardDefinitionSchema, playable: z.boolean(), unavailableReason: z.string().nullable() })) });
+export const deckUpdateSchema = z
+  .strictObject({
+    name: z.string().trim().min(1).max(60).optional(),
+    cardIds: z.array(idSchema).max(LIMITS.deck).optional(),
+    expectedRevision: z.number().int().positive(),
+  })
+  .refine(
+    (data) => data.name !== undefined || data.cardIds !== undefined,
+    'Provide a name or card list',
+  );
+export const deckDeleteSchema = z.strictObject({
+  expectedRevision: z.number().int().positive(),
+});
+export const savedDeckSchema = z.strictObject({
+  id: idSchema,
+  name: z.string().min(1).max(60),
+  cardIds: z.array(idSchema).length(LIMITS.deck),
+  revision: z.number().int().positive(),
+  rulesVersion: z.literal(RULES_VERSION),
+  catalogVersion: z.literal(1),
+  valid: z.literal(true),
+  playable: z.boolean(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export const deckListSchema = z.strictObject({
+  decks: z.array(savedDeckSchema),
+});
+export const catalogResponseSchema = z.strictObject({
+  rulesVersion: z.literal(RULES_VERSION),
+  catalogVersion: z.literal(1),
+  cards: z.array(
+    z.strictObject({
+      definition: cardDefinitionSchema,
+      playable: z.boolean(),
+      unavailableReason: z.string().nullable(),
+    }),
+  ),
+});

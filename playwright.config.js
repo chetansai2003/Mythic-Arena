@@ -1,7 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
+
+process.env.MYTHIC_E2E_RUN_ID ||= randomUUID().replaceAll('-', '');
 
 export default defineConfig({
   testDir: './tests/e2e',
+  timeout: 60000,
+  globalTeardown: './tests/e2e/cleanup.js',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
@@ -37,10 +42,19 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: 'npm run preview -w @mythic/web',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 30000,
-  },
+  webServer: [
+    {
+      command: 'node scripts/test-api.js',
+      url: 'http://127.0.0.1:3101/health/ready',
+      reuseExistingServer: false,
+      timeout: 60000,
+    },
+    {
+      command: 'npm run preview -w @mythic/web',
+      url: 'http://127.0.0.1:4173',
+      env: { API_PROXY_TARGET: 'http://127.0.0.1:3101' },
+      reuseExistingServer: false,
+      timeout: 30000,
+    },
+  ],
 });

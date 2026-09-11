@@ -1,4 +1,4 @@
-name: Part 1 verification
+name: Foundation and accounts verification
 on: [push, pull_request]
 permissions:
   contents: read
@@ -15,16 +15,16 @@ jobs:
       - run: npm ci
       - run: npm run setup
       - run: npm run check
-      - run: docker compose -f infra/compose.yml up -d --wait redis mongo mongo-init
+      - run: docker compose -f docker-compose.yml up -d --wait redis mongo mongo-init
       - run: npm run test:integration
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
-      - run: docker compose -f infra/compose.yml up -d --build --wait
+      - run: docker compose -f docker-compose.yml up -d --build --wait
       - name: Check full-stack routes and readiness
         run: node scripts/smoke-stack.js
       - name: Collect service logs
         if: always()
-        run: docker compose -f infra/compose.yml logs --no-color > compose.log
+        run: docker compose -f docker-compose.yml logs --no-color > compose.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -34,4 +34,4 @@ jobs:
             playwright-report/
             compose.log
       - if: always()
-        run: docker compose -f infra/compose.yml down
+        run: docker compose -f docker-compose.yml down

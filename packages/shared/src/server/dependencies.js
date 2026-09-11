@@ -26,7 +26,8 @@ export function createDependencies(config, logger) {
   const mongo = new MongoClient(config.MONGODB_URI, {
     serverSelectionTimeoutMS: 1000,
     connectTimeoutMS: 1000,
-    socketTimeoutMS: 1500,
+    // Readiness stays bounded by within(); transactions/index creation may take longer.
+    socketTimeoutMS: 10000,
   });
   redis.on('error', () =>
     logger.warn({ dependency: 'redis' }, 'Dependency connection unavailable'),

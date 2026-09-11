@@ -6,8 +6,12 @@ export async function startService({ config, logger, handlerFactory, port }) {
   const dependencies = createDependencies(config, logger);
   dependencies.start();
   let handler;
-  try { handler = await handlerFactory({ dependencies, lifecycle }); }
-  catch (error) { await dependencies.close(); throw error; }
+  try {
+    handler = await handlerFactory({ dependencies, lifecycle });
+  } catch (error) {
+    await dependencies.close();
+    throw error;
+  }
   const server = createServer(handler);
   server.requestTimeout = 5000;
   server.headersTimeout = 5000;

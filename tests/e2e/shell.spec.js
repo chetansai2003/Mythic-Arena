@@ -2,6 +2,16 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test.beforeEach(async ({ page }) => {
+  await page.route('**/api/auth/**', (route) =>
+    route.request().url().endsWith('/csrf')
+      ? route.fulfill({ json: { csrfToken: 'test-csrf' } })
+      : route.fulfill({
+          status: 401,
+          json: {
+            error: { code: 'UNAUTHENTICATED', message: 'Sign in to continue' },
+          },
+        }),
+  );
   await page.route('**/api/health/ready', (route) =>
     route.fulfill({
       json: { status: 'ready', dependencies: { redis: true, mongo: true } },
@@ -33,8 +43,8 @@ test('lobby renders honestly, navigation and direct refresh work', async ({
     page.getByRole('heading', { level: 1, name: 'My decks' }),
   ).toBeVisible();
   await expect(
-    page.getByRole('button', { name: 'Create deck' }),
-  ).toBeDisabled();
+    page.getByRole('heading', { name: 'Make room for your legends.' }),
+  ).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

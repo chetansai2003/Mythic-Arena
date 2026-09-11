@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 
 function compose(...args) {
-  execFileSync('docker', ['compose', '-f', 'infra/compose.yml', ...args], {
+  execFileSync('docker', ['compose', '-f', 'docker-compose.yml', ...args], {
     stdio: 'inherit',
   });
 }

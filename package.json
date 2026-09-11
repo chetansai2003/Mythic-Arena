@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "apps/*",
+    "frontend",
+    "backend",
+    "backend/src/workers",
+    "backend/src/services/gameEngine",
     "packages/*"
   ],
   "engines": {
@@ -23,10 +26,10 @@
     "test:e2e": "playwright test",
     "build": "npm run build -w @mythic/web && node scripts/validate-modules.js",
     "check": "npm run lint && npm run format:check && npm test && npm run build",
-    "infra:up": "docker compose -f infra/compose.yml up -d --wait",
-    "infra:down": "docker compose -f infra/compose.yml down",
+    "infra:up": "docker compose up -d --build --wait",
+    "infra:down": "docker compose -f docker-compose.yml down",
     "setup": "node scripts/setup-env.js",
-    "db:setup": "node --env-file-if-exists=.env apps/api/src/setup.js"
+    "db:setup": "node --env-file-if-exists=.env backend/src/setup.js"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

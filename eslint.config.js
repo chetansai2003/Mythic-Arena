@@ -29,11 +29,11 @@ export default [
     },
   },
   {
-    files: ['apps/web/src/**/*.{js,jsx}', 'tests/e2e/**/*.js'],
+    files: ['frontend/src/**/*.{js,jsx}', 'tests/e2e/**/*.js'],
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['apps/web/src/**/*.{js,jsx}'],
+    files: ['frontend/src/**/*.{js,jsx}'],
     plugins: { 'react-hooks': hooks },
     rules: {
       'react-hooks/rules-of-hooks': 'error',
@@ -43,8 +43,8 @@ export default [
         {
           patterns: [
             '@mythic/shared/server',
-            '**/apps/api/**',
-            '**/apps/worker/**',
+            '**/backend/**',
+            '**/backend/src/workers/**',
             'node:*',
           ],
         },
@@ -52,7 +52,7 @@ export default [
     },
   },
   {
-    files: ['packages/game-engine/src/**/*.js'],
+    files: ['backend/src/services/gameEngine/src/**/*.js'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -60,7 +60,12 @@ export default [
           patterns: [
             'node:*',
             '@mythic/shared/server',
-            '**/apps/**',
+            '**/frontend/**',
+            '**/backend/src/controllers/**',
+            '**/backend/src/routes/**',
+            '**/backend/src/models/**',
+            '**/backend/src/middleware/**',
+            '**/backend/src/workers/**',
             'redis',
             'mongodb',
             'express',

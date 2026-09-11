@@ -13,16 +13,16 @@ Implementation complete; local verification gate passed on September 11, 2026. A
 
 ## Observed commands and results
 
-| Command/check | Result |
-| --- | --- |
-| `npm run check` | Passed lint, formatting, 42 unit/component tests across six files, production build, and server module validation |
-| `npm run test:integration` | 3 passed: Redis round trip, MongoDB transaction commit/rollback, bounded connection loss/recovery |
-| `npm run test:e2e` | 21 passed across Chromium 1440x900, 1280x720, and 390x844; final run 1.9 minutes |
-| Automated accessibility | No reported WCAG 2 A/AA and 2.1 AA violations on lobby, decks, settings, and login at all three viewports; manual usability inspection complements this limited automated check |
-| Docker image `npm ci` and build | Clean Linux dependency installation and production build succeeded |
-| `docker compose -f infra/compose.yml up -d --wait` | Redis, MongoDB, API, worker, and frontend healthy; initializer exited successfully |
-| `node scripts/smoke-stack.js` | API/worker readiness, frontend proxy, and direct routes passed |
-| `node scripts/recovery-stack.js` | Stopped project Redis: API/worker readiness 503 and liveness 200; both recovered readiness after restart |
+| Command/check                                       | Result                                                                                                                                                                          |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run check`                                     | Passed lint, formatting, 42 unit/component tests across six files, production build, and server module validation                                                               |
+| `npm run test:integration`                          | 3 passed: Redis round trip, MongoDB transaction commit/rollback, bounded connection loss/recovery                                                                               |
+| `npm run test:e2e`                                  | 21 passed across Chromium 1440x900, 1280x720, and 390x844; final run 1.9 minutes                                                                                                |
+| Automated accessibility                             | No reported WCAG 2 A/AA and 2.1 AA violations on lobby, decks, settings, and login at all three viewports; manual usability inspection complements this limited automated check |
+| Docker image `npm ci` and build                     | Clean Linux dependency installation and production build succeeded                                                                                                              |
+| `docker compose -f docker-compose.yml up -d --wait` | Redis, MongoDB, API, worker, and frontend healthy; initializer exited successfully                                                                                              |
+| `node scripts/smoke-stack.js`                       | API/worker readiness, frontend proxy, and direct routes passed                                                                                                                  |
+| `node scripts/recovery-stack.js`                    | Stopped project Redis: API/worker readiness 503 and liveness 200; both recovered readiness after restart                                                                        |
 
 Runtime: Windows host Node 22.17.0/npm 10.9.2, Docker Desktop Linux engine 29.5.3; Linux app image Node 22.17.0. Exact library versions are in package-lock.json. Build at this milestone: approximately 368 kB JavaScript / 117 kB gzip and 23.5 kB CSS / 6.5 kB gzip.
 

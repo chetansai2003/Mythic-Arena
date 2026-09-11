@@ -1,43 +1,52 @@
 # Mythic Arena
 
-A JavaScript foundation for an original, turn-based 1v1 card game. Part 1 provides the application shell, shared runtime contracts, local infrastructure, and verification tooling. Accounts, saved decks, the engine, matchmaking, and 3D are later milestones. Preview screens do not imply working online play.
+A JavaScript 1v1 card-game project. Parts 1 and 2 provide the accessible application shell, secure local accounts, an original 20-card catalog, and persistent deck building. The game engine, practice battles, and online matchmaking are later milestones; the UI labels them as unavailable.
 
-## Start the complete local application
+## Run locally
 
-Prerequisites: Docker Desktop with its Linux engine running and Docker Compose v2. The image builds the app, so a host Node installation is not required for this path.
-
-```sh
-docker compose -f infra/compose.yml up -d --build --wait
-```
-
-Open **http://localhost:5173/lobby**. The API is at http://127.0.0.1:3001 and worker health at http://127.0.0.1:3002. Development Redis uses port 6379; the project MongoDB uses **27018** to avoid the usual host MongoDB port. MongoDB inside Compose still uses port 27017.
-
-```sh
-docker compose -f infra/compose.yml ps
-docker compose -f infra/compose.yml logs api worker
-docker compose -f infra/compose.yml down
-```
-
-Ordinary `down` preserves the project database volumes. Do not add `--volumes` unless you intend to erase this project's development data. These loopback-only services have no production credentials; they are for local development.
-
-## Develop with host Node
-
-Use Node **22.17.0** and npm **10.9.2** (also recorded in .nvmrc and package.json). These commands work from a folder with spaces on Windows and from Linux. Install dependencies before running scripts:
+Prerequisites: Node **22.17.0**, npm **10.9.2**, and Docker Desktop with the Linux engine running. From this folder:
 
 ```sh
 npm ci
-docker compose -f infra/compose.yml up -d --wait redis mongo mongo-init
+npm run setup
+docker compose -f docker-compose.yml up -d --build --wait
 ```
 
-Copy `.env.example` to `.env`. In PowerShell: `Copy-Item .env.example .env`; on Linux/macOS: `cp .env.example .env`. Then:
+Open **http://localhost:5173/lobby**. Create an account using a password of at least 12 characters, open My decks, name a deck, use the starter list or select 30 cards, and save. No accounts or passwords are seeded. All 20 original cards are available to every account.
+
+`npm run setup` creates a local `.env` and a random authentication secret without printing it. It preserves existing configuration and replaces only an absent or placeholder secret. Never commit `.env`. Compose initializes a MongoDB replica set and runs the idempotent catalog/index setup as a separate one-shot service before starting the API.
+
+| Service                    | Local address                      |
+| -------------------------- | ---------------------------------- |
+| Frontend                   | http://localhost:5173              |
+| API                        | http://127.0.0.1:3001              |
+| Worker health              | http://127.0.0.1:3002/health/ready |
+| MongoDB replica-set member | 127.0.0.1:27018                    |
+| Redis                      | 127.0.0.1:6379                     |
+
+MongoDB uses host port 27018 to avoid an existing service on 27017. All published development ports bind to loopback. This profile has no production database credentials and is intended for local development.
 
 ```sh
+docker compose -f docker-compose.yml ps
+docker compose -f docker-compose.yml logs api worker db-setup
+docker compose -f docker-compose.yml down
+```
+
+Ordinary shutdown preserves data volumes. Adding `--volumes` erases this project's local databases; do so only for an intentional reset.
+
+## Develop with host Node
+
+```sh
+npm ci
+npm run setup
+docker compose -f docker-compose.yml up -d --wait redis mongo mongo-init
+npm run db:setup
 npm run dev
 ```
 
-If the full Compose app is already running, stop its app containers first to free the ports: `docker compose -f infra/compose.yml stop web api worker`. Keep the dependency containers running. `npm run dev:web` starts just the frontend and remains useful while services are unavailable; the lobby reports the actual connection state.
+If the full Compose application already runs, free its app ports first with `docker compose -f docker-compose.yml stop web api worker`. Keep the dependency containers running. `npm run dev:web` starts only the frontend and reports service unavailability honestly.
 
-The host MongoDB URI uses `directConnection=true` because the replica-set member is advertised as `mongo:27017`, a hostname reachable within Compose only. The host connects directly to the single member on 127.0.0.1:27018. Do not carry this single-node development topology into production.
+The host MongoDB URI uses `directConnection=true` because the single replica-set member advertises its Docker hostname (`mongo:27017`). Host processes connect to 127.0.0.1:27018; container processes use the Docker hostname. Do not reuse this single-node development topology as a production design.
 
 ## Verify
 
@@ -48,43 +57,46 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-`check` runs lint, formatting, unit/component tests, and build. Integration tests require the Redis and initialized replica-set services. They use a unique test database and Redis prefix and clean only their own data. Browser tests use the production build from `check`, start a Vite preview on port 4173, and cover three viewports. On Linux CI install browser system dependencies with `npx playwright install --with-deps chromium`.
+- `check`: lint, formatting, unit/component tests, production frontend build, and server/package validation.
+- `test:integration`: real Redis operations, MongoDB transactions, session expiry/rotation/reuse/logout, CSRF, throttles, deck ownership, invalid decks, revision conflicts, and frozen snapshot preparation.
+- `test:e2e`: shell checks at three viewport sizes plus real registration/login/deck journeys. It launches an isolated API on port 3101 and a production preview on 4173. Redis and MongoDB must be running. Each run owns a unique temporary database and Redis prefix, cleaned after the run. Other application data is untouched.
 
-With the full Compose stack running, `node scripts/smoke-stack.js` verifies API/worker readiness, the frontend API proxy, and direct routes. `node scripts/recovery-stack.js` temporarily stops only this project's Redis container, verifies degraded readiness with working liveness, then starts it and verifies recovery. That recovery script must only be run against the development stack.
+On Linux CI use `npx playwright install --with-deps chromium`. Browser traces and screenshots appear under `test-results/`, and the HTML report under `playwright-report/`. Ports 3101 and 4173 must be free; the suite deliberately refuses to reuse an unrelated running server. The two-account journey runs on desktop once, while editor and shell checks run at desktop, laptop, and phone sizes.
 
-| Script                            | Purpose                                          |
-| --------------------------------- | ------------------------------------------------ |
-| `npm run lint`                    | JavaScript, hooks, and import boundaries         |
-| `npm run format` / `format:check` | Format or verify source and docs                 |
-| `npm test`                        | Unit and component tests                         |
-| `npm run test:integration`        | Real Redis operations and MongoDB transactions   |
-| `npm run test:e2e`                | Chromium desktop/laptop/phone journeys           |
-| `npm run build`                   | Production frontend and server module validation |
+With the complete Compose stack running:
 
-There is no TypeScript compilation or placeholder `typecheck`. JavaScript validation is intentional. Application imports do not start listeners; only the API/worker executable entry points do.
-
-## Structure
-
-```text
-apps/web/              React, Vite, Tailwind, Redux Toolkit, route shell
-apps/api/              Express health, errors, origins, request IDs
-apps/worker/           Independent dependency-aware process; no jobs yet
-packages/shared/      Strict Zod contracts and isolated server utilities
-packages/game-engine/ Pure-engine boundary reserved for Part 3
-infra/                Compose, Dockerfile, MongoDB replica-set initializer
-tests/                Browser/integration suites and component setup
-docs/                 Decisions, contracts, plans, and observed evidence
+```sh
+node scripts/smoke-stack.js
+node scripts/recovery-stack.js
 ```
 
-The browser may import `@mythic/shared` but never `@mythic/shared/server`. Commands do not accept actor identity. Player-safe snapshots explicitly exclude opponent hand contents, seeds, and deck order. Later engine/network tests must verify actual projection and delivery as well.
+The recovery script temporarily stops only this project's Redis container, checks readiness failure with working liveness, restarts Redis, and checks automatic recovery. Run it only against the development stack.
 
-## Troubleshooting and handoff
+## Application boundaries
 
-- **Docker unavailable:** Start its Linux engine; confirm `docker info`. Browser-only development still works, but the infrastructure gate is not passed without service tests.
-- **Port conflict:** Identify the existing listener; do not terminate an unrelated service. Update the relevant Compose host port, host `.env`, and test override together. Integration overrides: `TEST_REDIS_URL`, `TEST_MONGODB_URI`.
-- **Replica set not ready:** Check `docker compose -f infra/compose.yml logs mongo-init mongo`. Startup waits for a writable primary; rerunning initialization is safe.
-- **Readiness 503:** Inspect dependency status. Liveness remains 200 during a dependency outage. The API never creates an independent in-memory substitute.
-- **Invalid environment:** Only field names are reported; values are not logged. Fix `.env` and restart.
-- **Browser installation fails:** Retry the exact Playwright install command. A skipped browser suite is not a pass.
+```text
+frontend/                         React application, accounts and deck editor
+backend/                          Express API, identity and deck persistence
+backend/src/workers/              Separate worker process
+backend/src/services/gameEngine/  Pure engine boundary (Part 3)
+packages/shared/                  Runtime contracts and server utilities
+infra/                            App image and replica-set initialization
+docker-compose.yml                Full local development stack
+scripts/                          Setup, validation and recovery tools
+```
 
-See [rules](RULES.md), [decisions](docs/DECISIONS.md), [contracts](docs/contracts.md), and [Part 1 evidence](docs/part-1-report.md). The CI workflow is ready for GitHub but is only observed as a remote CI run after the project is placed in a Git repository and pushed. No production resources are provisioned.
+Application code is JavaScript/JSX with ES modules. There is no TypeScript compilation or fake `typecheck` command. Browser imports cannot use the shared server entry point; the engine boundary cannot import database or network code.
+
+Access tokens stay in memory. Refresh tokens are random, hashed in MongoDB, rotated transactionally, and carried in httpOnly cookies. Mutations require CSRF and explicit origins. Production requires secure host-only cookies and HTTPS origins. Deck writes use authenticated ownership and expected revisions. Incomplete drafts stay in the current tab until they can be saved as valid 30-card decks.
+
+## Troubleshooting
+
+- Start Docker's Linux engine and confirm `docker info` before running integration/browser checks.
+- For port conflicts, identify the existing listener instead of stopping unrelated applications. Update Compose host ports, host `.env`, and test overrides consistently. Test overrides are `TEST_REDIS_URL` and `TEST_MONGODB_URI`.
+- If readiness is 503, inspect dependency health and `db-setup` logs. Run `npm run db:setup` for a host-development database. Never fall back to independent local match state during Redis failure.
+- Invalid configuration reports field names without printing values. Fix `.env` and restart.
+- Refresh-token reuse ends the session; sign in again. Use independent private windows or browser profiles to test different accounts simultaneously.
+- Failed deck saves preserve the draft. A revision conflict offers reload or save-a-copy. Browser storage failures still permit in-memory editing, but cannot promise draft recovery after closing the tab.
+- The GitHub workflow is configured, but a remote CI pass exists only after publishing a repository and actually running it. No remote repository or production deployment is created by this implementation.
+
+See [folder architecture](docs/ARCHITECTURE.md), [deployment](docs/DEPLOYMENT.md), [rules](docs/RULES.md), [decisions](docs/DECISIONS.md), [shared contracts](docs/contracts.md), [account/deck API](docs/part-2-api.md), [Part 1 evidence](docs/part-1-report.md), and [Part 2 evidence](docs/part-2-report.md).

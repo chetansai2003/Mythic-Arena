@@ -1,0 +1,17 @@
+{
+  "name": "@mythic/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./server": "./src/server/index.js",
+    "./fixtures": "./src/fixtures.js"
+  },
+  "dependencies": {
+    "mongodb": "7.6.0",
+    "pino": "10.3.1",
+    "redis": "6.2.1",
+    "zod": "4.6.1"
+  }
+}

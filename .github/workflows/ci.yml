@@ -1,0 +1,37 @@
+name: Part 1 verification
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run setup
+      - run: npm run check
+      - run: docker compose -f infra/compose.yml up -d --wait redis mongo mongo-init
+      - run: npm run test:integration
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: docker compose -f infra/compose.yml up -d --build --wait
+      - name: Check full-stack routes and readiness
+        run: node scripts/smoke-stack.js
+      - name: Collect service logs
+        if: always()
+        run: docker compose -f infra/compose.yml logs --no-color > compose.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-evidence
+          path: |
+            test-results/
+            playwright-report/
+            compose.log
+      - if: always()
+        run: docker compose -f infra/compose.yml down

@@ -1,0 +1,13 @@
+{
+  "name": "@mythic/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=../../.env src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@mythic/shared": "0.1.0"
+  }
+}

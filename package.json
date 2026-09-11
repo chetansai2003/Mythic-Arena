@@ -1,0 +1,48 @@
+{
+  "name": "mythic-arena",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.17.0 <23",
+    "npm": ">=10.9.2 <11"
+  },
+  "packageManager": "npm@10.9.2",
+  "scripts": {
+    "dev": "concurrently --kill-others -n web,api,worker \"npm run dev -w @mythic/web\" \"npm run dev -w @mythic/api\" \"npm run dev -w @mythic/worker\"",
+    "dev:web": "npm run dev -w @mythic/web",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.js",
+    "test:e2e": "playwright test",
+    "build": "npm run build -w @mythic/web && node scripts/validate-modules.js",
+    "check": "npm run lint && npm run format:check && npm test && npm run build",
+    "infra:up": "docker compose -f infra/compose.yml up -d --wait",
+    "infra:down": "docker compose -f infra/compose.yml down",
+    "setup": "node scripts/setup-env.js",
+    "db:setup": "node --env-file-if-exists=.env apps/api/src/setup.js"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
+    "concurrently": "10.0.5",
+    "eslint": "10.10.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.6",
+    "globals": "17.12.0",
+    "jsdom": "29.1.1",
+    "prettier": "3.9.6",
+    "supertest": "7.2.2",
+    "vitest": "5.0.0"
+  }
+}

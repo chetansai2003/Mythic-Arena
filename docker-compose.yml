@@ -1,6 +1,6 @@
 name: mythic-arena
 x-app: &app
-  image: mythic-arena-dev:part2
+  image: mythic-arena-dev:part3
   pull_policy: never
   init: true
   restart: unless-stopped

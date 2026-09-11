@@ -8,7 +8,14 @@ for (const url of [
   assert.equal(response.status, 200, url);
   assert.equal((await response.json()).status, 'ready', url);
 }
-for (const path of ['/', '/lobby', '/decks', '/settings', '/match/preview']) {
+for (const path of [
+  '/',
+  '/lobby',
+  '/decks',
+  '/practice',
+  '/settings',
+  '/match/preview',
+]) {
   const response = await fetch(`http://127.0.0.1:5173${path}`);
   assert.equal(response.status, 200, path);
   assert.match(await response.text(), /<div id="root">/, path);

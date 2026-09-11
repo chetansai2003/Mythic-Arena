@@ -507,8 +507,7 @@ function DeckEditor() {
           <div className="deck-validation" role="status">
             {valid ? (
               <>
-                <Check size={15} /> Complete deck · battles arrive in the next
-                milestones.
+                <Check size={15} /> Complete deck · ready for practice.
               </>
             ) : (
               <>

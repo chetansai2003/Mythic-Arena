@@ -302,7 +302,7 @@ describe('catalog and deck persistence', () => {
     const response = await request(app).get('/cards');
     expect(response.status).toBe(200);
     expect(response.body.cards).toHaveLength(20);
-    expect(response.body.cards.every((card) => card.playable === false)).toBe(
+    expect(response.body.cards.every((card) => card.playable === true)).toBe(
       true,
     );
   });

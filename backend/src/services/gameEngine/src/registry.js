@@ -3,8 +3,12 @@ import { damage } from './rules.js';
 export const ENGINE_READY = true;
 export const EFFECT_HANDLERS = Object.freeze({
   DAMAGE: (target, effect) => damage(target, effect.amount),
-  HEAL: (target, effect) => { target.health = Math.min(target.maxHealth, target.health + effect.amount); },
-  SHIELD: (target) => { target.shield = true; },
+  HEAL: (target, effect) => {
+    target.health = Math.min(target.maxHealth, target.health + effect.amount);
+  },
+  SHIELD: (target) => {
+    target.shield = true;
+  },
 });
 export const EFFECT_REGISTRY = Object.freeze({
   DAMAGE: Object.freeze({ target: 'ENEMY_CHARACTER', implemented: true }),

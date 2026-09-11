@@ -1,4 +1,6 @@
 import { Layout, NotFound, RouteError } from './App.jsx';
+import { lazy, Suspense } from 'react';
+const Practice = lazy(() => import('./pages/Game/Practice.jsx'));
 import Home from './pages/Home/index.jsx';
 import Lobby from './pages/Lobby/index.jsx';
 import HistoryPage from './pages/MatchHistory/index.jsx';
@@ -13,6 +15,14 @@ export const routes = [
     element: <Layout />,
     errorElement: <RouteError />,
     children: [
+      {
+        path: '/practice',
+        element: (
+          <Suspense fallback={<p role="status">Loading practice…</p>}>
+            <Practice />
+          </Suspense>
+        ),
+      },
       { path: '/', element: <Home /> },
       { path: '/lobby', element: <Lobby /> },
       { path: '/decks', element: <DeckBuilderPage /> },

@@ -14,7 +14,10 @@ export default defineConfig({
         test: {
           name: 'web',
           environment: 'jsdom',
-          include: ['frontend/**/*.test.{js,jsx}'],
+          include: [
+            'frontend/**/*.test.{js,jsx}',
+            'tests/visual/**/*.test.jsx',
+          ],
           setupFiles: ['./tests/setup-web.js'],
         },
         oxc: { jsx: { runtime: 'automatic' } },

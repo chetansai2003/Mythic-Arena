@@ -52,6 +52,6 @@ The worker remains a separate process even though its workspace is under `backen
 
 Tailwind 4 is configured through the Vite plugin and CSS theme declarations; a redundant Tailwind JavaScript config is unnecessary. No TypeScript configs or `.ts`/`.tsx` application files are needed.
 
-Parts 1 and 2 provide the application shell, accounts, catalog, and persistent decks. Game rules execution, Socket.IO, timers, match results, rankings and interactive 3D remain later milestones. Reserved folders contain no pretend implementations.
+Parts 1?3 provide the application shell, accounts, catalog, persistent decks, pure game rules and a local 2D practice match with a bot. Socket.IO, durable timers, persisted match results, rankings and interactive 3D remain later milestones. Reserved folders contain no pretend implementations.
 
 See [rules](RULES.md), [API and events](API_EVENTS.md), [deployment](DEPLOYMENT.md), and [decisions](DECISIONS.md).

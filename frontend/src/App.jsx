@@ -111,7 +111,7 @@ export function Layout() {
           </button>
           <div className="sidebar-footer">
             <span className="status-dot" />
-            VERSION 0.2 <span>PART 02</span>
+            VERSION 0.3 <span>PART 03</span>
           </div>
         </div>
       </aside>
@@ -180,8 +180,8 @@ export function Layout() {
           </li>
         </ol>
         <p className="muted">
-          This is a foundation preview. Playable battles arrive in a later
-          milestone.
+          Try these rules in Practice grounds. Online matchmaking arrives in the
+          next milestone.
         </p>
       </Dialog>
     </div>

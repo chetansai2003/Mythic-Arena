@@ -79,6 +79,14 @@ test('two independent accounts persist their own decks through refresh and login
     await expect(
       page.getByRole('combobox', { name: 'Choose your deck' }),
     ).toContainText('Northern Lights');
+    await page.getByRole('link', { name: 'Practice with deck' }).click();
+    await expect(page).toHaveURL(/\/practice\?deck=/);
+    await page
+      .getByRole('button', { name: 'Start practice', exact: true })
+      .click();
+    await expect(
+      page.getByRole('heading', { name: 'Battle arena', exact: true }),
+    ).toBeVisible();
   } finally {
     await other.close();
   }

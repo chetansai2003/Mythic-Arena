@@ -114,6 +114,14 @@ export default function LobbyDecks() {
         {state.decks.length ? 'Edit decks' : 'Build a deck'}
         <ArrowRight size={15} />
       </Link>
+      {state.selected && (
+        <Link
+          to={`/practice?deck=${encodeURIComponent(state.selected)}`}
+          className="button button-primary"
+        >
+          Practice with deck
+        </Link>
+      )}
     </div>
   );
 }

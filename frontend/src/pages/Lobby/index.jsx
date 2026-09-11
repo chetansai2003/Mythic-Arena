@@ -153,10 +153,9 @@ export default function Lobby({ home = false }) {
               Learn your cards. Find your rhythm.
               <br /> Prepare for the battles ahead.
             </p>
-            <button className="mode-action" disabled>
-              <LockKeyhole size={14} /> Practice coming soon{' '}
-              <ArrowRight size={16} />
-            </button>
+            <Link className="mode-action" to="/practice">
+              <Target size={14} /> Start practice <ArrowRight size={16} />
+            </Link>
           </article>
           <article className="mode-card">
             <div className="mode-top">

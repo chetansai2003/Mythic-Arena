@@ -1,6 +1,6 @@
 # Shared contracts — version 1
 
-Source of truth: `packages/shared/src/index.js`. All wire objects use strict Zod schemas. Fields not explicitly declared are rejected rather than silently copied into responses. Network handlers are implemented in later parts.
+Source of truth: `packages/shared/src/index.js`. All wire objects use strict Zod schemas. Fields not explicitly declared are rejected rather than silently copied into responses. Account/deck HTTP handlers are implemented in Step 2; the Step 3 engine consumes game commands and emits safe snapshots. Socket handlers remain Step 4.
 
 ## Data
 
@@ -61,4 +61,4 @@ The API generates a UUID request ID unless a safe 1-80 character caller ID is su
 
 ## Verification limits
 
-Fixtures are deterministic examples, not a playable catalog or live data. Part 1 tests schema strictness and lifecycle shapes. Engine legality, hidden-information projection, authentication, concurrency, retransmission, and result delivery remain later gates.
+Fixtures are deterministic examples, not a playable catalog or live data. Part 1 tests schema strictness and lifecycle shapes. Step 2 verifies authentication and deck persistence; Step 3 verifies engine legality and hidden-information projection. Online concurrency, retransmission and durable result delivery remain Step 4 gates. See part-3-transport.md for local practice semantics.

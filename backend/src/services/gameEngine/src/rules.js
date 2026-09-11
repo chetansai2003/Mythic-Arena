@@ -4,7 +4,7 @@ import { LIMITS } from '@mythic/shared';
 export function damage(target, amount) {
   if (amount <= 0) return;
   if (target.shield) target.shield = false;
-  else target.health -= amount;
+  else target.health = Math.max(0, target.health - amount);
 }
 
 export function resolveDeaths(state) {
@@ -16,7 +16,9 @@ export function resolveDeaths(state) {
 export function removeDeaths(state) {
   for (const player of state.players) {
     const dead = player.board.filter((unit) => unit.health <= 0);
-    player.discard.push(...dead.map(({ instanceId, definition }) => ({ instanceId, definition })));
+    player.discard.push(
+      ...dead.map(({ instanceId, definition }) => ({ instanceId, definition })),
+    );
     player.board = player.board.filter((unit) => unit.health > 0);
   }
 }
@@ -25,7 +27,12 @@ export function determineOutcome(state) {
   if (state.outcome) return structuredClone(state.outcome);
   const dead = state.players.filter((player) => player.health <= 0);
   if (dead.length === 2) return { kind: 'DRAW', reason: 'SIMULTANEOUS_DEFEAT' };
-  if (dead.length === 1) return { kind: 'WIN', winnerId: state.players.find((p) => p.id !== dead[0].id).id, reason: 'DEFEAT' };
+  if (dead.length === 1)
+    return {
+      kind: 'WIN',
+      winnerId: state.players.find((p) => p.id !== dead[0].id).id,
+      reason: 'DEFEAT',
+    };
   return null;
 }
 
@@ -69,7 +76,8 @@ export function nextTurn(state, now) {
 export function findTarget(state, target) {
   if (!target) return null;
   for (const player of state.players) {
-    if (target.kind === 'HERO' && target.playerId === player.id) return { owner: player, character: player };
+    if (target.kind === 'HERO' && target.playerId === player.id)
+      return { owner: player, character: player };
     if (target.kind === 'UNIT') {
       const unit = player.board.find((u) => u.instanceId === target.instanceId);
       if (unit) return { owner: player, character: unit };

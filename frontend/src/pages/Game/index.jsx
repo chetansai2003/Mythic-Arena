@@ -26,8 +26,9 @@ export default function MatchPage() {
             </Link>
           }
         >
-          Playable matches arrive after the game engine and multiplayer
-          milestones. This link does not connect to a live game.
+          Online matches arrive with the multiplayer milestone. You can play
+          against the apprentice in <Link to="/practice">Practice grounds</Link>{' '}
+          now.
         </EmptyState>
       </div>
     </div>

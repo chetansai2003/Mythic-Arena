@@ -39,7 +39,7 @@ Saved decks require exactly 30 known card IDs, at most two of each. All 20 seede
 
 The seed is explicit and idempotent. Index creation and 20 versioned definitions complete before the schema-ready marker is written. Existing version-1 card definitions are immutable; a changed definition requires a new version. The initializer does not create users or overwrite user decks. Compose runs this as a separate one-shot service before the API starts.
 
-Each card has declared finite behavior and a nullable artwork reference; faction artwork is an original SVG/CSS fallback. The engine registry declares DAMAGE, HEAL, SHIELD, and GUARD contracts but marks them unimplemented. `valid: true` means deck composition is valid; `playable: false` is explicit until the engine launches.
+Each card has declared finite behavior and a nullable artwork reference; faction artwork is an original SVG/CSS fallback. As of Step 3 the engine implements DAMAGE, HEAL, SHIELD, and GUARD. `valid: true` means deck composition is valid; `playable: true` means the engine supports it for practice. It does not imply online matchmaking is available.
 
 The internal `snapshotForMatch` helper freezes rules/catalog/deck versions and definitions and assigns a distinct instance ID to each card occurrence. Once created, that snapshot's IDs remain stable and later deck edits do not change it. Part 3/4 must use it once at match creation and enforce engine readiness; Part 2 exposes no match-start endpoint.
 

@@ -10,6 +10,7 @@ import {
 } from '../middleware/security.js';
 import { createDeckService } from '../services/deckService.js';
 import { HttpError } from '../utils/errors.js';
+import { createGameService } from '../services/realtime/gameService.js';
 
 export async function createApiServices({
   config,
@@ -26,6 +27,7 @@ export async function createApiServices({
     onSessionRevoked,
   });
   const deckService = createDeckService(db, now);
+  const games = createGameService({ dependencies, config, deckService, now });
   const cookies = createCookieSecurity(config, now);
   const limit = createRateLimit(dependencies.redis, config.RATE_LIMIT_PREFIX);
   const router = Router();
@@ -33,7 +35,7 @@ export async function createApiServices({
     try {
       return (
         (await db.collection('metadata').findOne({ _id: 'schema' }))
-          ?.version === 2
+          ?.version === 3
       );
     } catch {
       return false;
@@ -54,5 +56,23 @@ export async function createApiServices({
   router.use('/auth', createAuthRoutes({ auth, cookies, limit, requireAuth }));
   router.use('/cards', createCardRoutes(deckService));
   router.use('/decks', createDeckRoutes({ deckService, cookies, requireAuth }));
-  return { router, isReady, auth, deckService };
+  router.get('/matches', requireAuth, async (req, res) =>
+    res.json({ matches: await games.history(req.auth.user.id) }),
+  );
+  router.get('/leaderboard', async (_req, res) =>
+    res.json({
+      players: (
+        await db
+          .collection('users')
+          .find(
+            { wins: { $gt: 0 } },
+            { projection: { displayName: 1, wins: 1 } },
+          )
+          .sort({ wins: -1, displayName: 1, _id: 1 })
+          .limit(50)
+          .toArray()
+      ).map((p) => ({ id: p._id, displayName: p.displayName, wins: p.wins })),
+    }),
+  );
+  return { router, isReady, auth, deckService, games };
 }

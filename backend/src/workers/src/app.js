@@ -10,7 +10,7 @@ export function createWorkerHandler({
         JSON.stringify({
           status: 'alive',
           service: 'worker',
-          jobs: 'not_implemented',
+          jobs: 'turns_disconnects_results',
         }),
       );
     if (req.method === 'GET' && req.url === '/health/ready') {

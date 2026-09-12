@@ -15,6 +15,9 @@ export async function setupDatabase(db) {
       .collection('session_families')
       .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 86400 }),
     db.collection('decks').createIndex({ userId: 1, updatedAt: -1 }),
+    db.collection('matches').createIndex({ 'players.id': 1, endedAt: -1 }),
+    db.collection('active_matches').createIndex({ 'players.id': 1 }),
+    db.collection('users').createIndex({ wins: -1, displayName: 1 }),
     db
       .collection('cards')
       .createIndex(
@@ -44,7 +47,7 @@ export async function setupDatabase(db) {
     .collection('metadata')
     .updateOne(
       { _id: 'schema' },
-      { $set: { version: 2, catalogVersion: 1 } },
+      { $set: { version: 3, catalogVersion: 1 } },
       { upsert: true },
     );
 }

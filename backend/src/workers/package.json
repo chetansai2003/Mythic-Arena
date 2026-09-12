@@ -8,6 +8,7 @@
     "start": "node src/index.js"
   },
   "dependencies": {
+    "@mythic/game-engine": "0.1.0",
     "@mythic/shared": "0.1.0"
   }
 }

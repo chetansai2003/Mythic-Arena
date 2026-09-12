@@ -5,6 +5,8 @@ import { parseApiConfig } from '../backend/src/config/env.js';
 import { setupDatabase } from '../backend/src/models/database.js';
 import { createApiServices } from '../backend/src/routes/index.js';
 import { createApp } from '../backend/src/app.js';
+import { attachSocketServer } from '../backend/src/sockets/socketServer.js';
+import { startGameWorker } from '../backend/src/workers/src/gameWorker.js';
 
 const runId = process.env.MYTHIC_E2E_RUN_ID;
 if (!/^[a-f0-9]{32}$/.test(runId ?? ''))
@@ -29,14 +31,28 @@ await writeFile(
   `.local/e2e-${runId}.json`,
   JSON.stringify({ database, prefix: config.RATE_LIMIT_PREFIX }),
 );
+let services;
+let sockets;
 await startService({
   config,
   logger,
   port: config.API_PORT,
   handlerFactory: async ({ dependencies, lifecycle }) => {
     await setupDatabase(dependencies.mongo.db(database));
-    const services = await createApiServices({ config, dependencies });
+    services = await createApiServices({
+      config,
+      dependencies,
+      onSessionRevoked: (familyId) => sockets?.revoke(familyId),
+    });
     return createApp({ config, dependencies, lifecycle, logger, services });
+  },
+  configureServer: ({ server }) => {
+    sockets = attachSocketServer({ server, config, services });
+    const stopWorker = startGameWorker(services.games, logger);
+    return async () => {
+      await stopWorker();
+      await sockets.close();
+    };
   },
 });
 console.log('Isolated browser-test API ready.');

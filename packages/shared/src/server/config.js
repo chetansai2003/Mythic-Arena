@@ -21,6 +21,10 @@ const schema = z.object({
   REDIS_URL: z.url().refine((v) => validUrl(v, ['redis:', 'rediss:'])),
   MONGODB_URI: z.string().regex(/^mongodb(?:\+srv)?:\/\/\S+$/),
   MONGODB_DB: z.string().regex(/^[a-zA-Z0-9_-]{1,60}$/),
+  GAME_PREFIX: z
+    .string()
+    .regex(/^[a-zA-Z0-9:_-]{1,100}$/)
+    .optional(),
   FRONTEND_ORIGINS: z
     .string()
     .min(1)
@@ -42,5 +46,8 @@ export function parseConfig(env) {
     ].join(', ');
     throw new Error(`Invalid environment fields: ${fields}`);
   }
-  return parsed.data;
+  return {
+    ...parsed.data,
+    GAME_PREFIX: parsed.data.GAME_PREFIX ?? `${parsed.data.MONGODB_DB}:game:`,
+  };
 }

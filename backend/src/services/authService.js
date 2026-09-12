@@ -224,7 +224,11 @@ export async function createAuthService({
       if (!family) throw invalidSession();
       const user = await users.findOne({ _id: payload.sub });
       if (!user) throw invalidSession();
-      return { user: publicUser(user), familyId: family._id };
+      return {
+        user: publicUser(user),
+        familyId: family._id,
+        expiresAt: payload.exp * 1000,
+      };
     },
     async logout(rawToken, authorization) {
       const familyIds = new Set();

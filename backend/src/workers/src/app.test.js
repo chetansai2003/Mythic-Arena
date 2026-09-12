@@ -9,7 +9,7 @@ it('reports worker readiness and explicitly has no gameplay jobs', async () => {
     dependencies: { check: async () => ({ redis: true, mongo: true }) },
   });
   expect((await request(app).get('/health/live')).body.jobs).toBe(
-    'not_implemented',
+    'turns_disconnects_results',
   );
   expect((await request(app).get('/health/ready')).status).toBe(200);
   lifecycle.shuttingDown = true;

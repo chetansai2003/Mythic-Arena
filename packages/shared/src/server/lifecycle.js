@@ -1,7 +1,13 @@
 import { createServer } from 'node:http';
 import { createDependencies } from './dependencies.js';
 
-export async function startService({ config, logger, handlerFactory, port }) {
+export async function startService({
+  config,
+  logger,
+  handlerFactory,
+  port,
+  configureServer,
+}) {
   const lifecycle = { shuttingDown: false };
   const dependencies = createDependencies(config, logger);
   dependencies.start();
@@ -13,6 +19,7 @@ export async function startService({ config, logger, handlerFactory, port }) {
     throw error;
   }
   const server = createServer(handler);
+  const cleanup = await configureServer?.({ server, dependencies, lifecycle });
   server.requestTimeout = 5000;
   server.headersTimeout = 5000;
   await new Promise((resolve, reject) => {
@@ -33,6 +40,7 @@ export async function startService({ config, logger, handlerFactory, port }) {
         process.exit(1);
       }, 5000);
       try {
+        await cleanup?.();
         await new Promise((resolve) => {
           server.close(resolve);
           server.closeIdleConnections();

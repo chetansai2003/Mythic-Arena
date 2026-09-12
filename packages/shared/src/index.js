@@ -161,6 +161,7 @@ export const errorSchema = z.strictObject({
     'RATE_LIMITED',
     'DEPENDENCY_UNAVAILABLE',
     'INTERNAL_ERROR',
+    'CONTROL_CONFLICT',
   ]),
   message: z.string().max(200),
   requestId: idSchema.optional(),

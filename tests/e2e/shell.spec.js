@@ -28,8 +28,8 @@ test('lobby renders honestly, navigation and direct refresh work', async ({
     page.getByRole('heading', { name: 'Enter the arena', exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole('button', { name: /Matchmaking coming soon/ }),
-  ).toBeDisabled();
+    page.getByRole('link', { name: /Choose a deck to find an opponent/ }),
+  ).toBeVisible();
   await expect(
     page.getByText('Services connected · online play coming later'),
   ).toBeVisible();

@@ -1,6 +1,6 @@
 # Shared contracts — version 1
 
-Source of truth: `packages/shared/src/index.js`. All wire objects use strict Zod schemas. Fields not explicitly declared are rejected rather than silently copied into responses. Account/deck HTTP handlers are implemented in Step 2; the Step 3 engine consumes game commands and emits safe snapshots. Socket handlers remain Step 4.
+Source of truth: `packages/shared/src/index.js`. All wire objects use strict Zod schemas. Fields not explicitly declared are rejected rather than silently copied into responses. Account/deck HTTP handlers are implemented in Step 2; the Step 3 engine consumes game commands and emits safe snapshots. Step 4 implements authenticated sockets, atomic state transitions, durable scheduling and results.
 
 ## Data
 
@@ -34,7 +34,7 @@ Source of truth: `packages/shared/src/index.js`. All wire objects use strict Zod
 
 PLAY_CARD accepts cardInstanceId and optional target. ATTACK requires attackerId and target. END_TURN and SURRENDER require an empty payload. Targets are `{ kind: 'HERO', playerId }` or `{ kind: 'UNIT', instanceId }`. A target player ID identifies the target, never the acting user. Actor identity comes from the authenticated socket/session.
 
-System actions such as deadline expiration must never be accepted through this command schema. Their internal worker schema will be added with deadline scheduling in Part 4.
+System actions such as deadline expiration must never be accepted through this command schema. The worker derives these transitions directly from stored readiness, turn and presence deadlines; no client timer event is accepted.
 
 ## Server events and acknowledgements
 
@@ -51,14 +51,14 @@ Accepted event types initially cover CARD_PLAYED, ATTACK_RESOLVED, TURN_STARTED,
 
 Acknowledgements are `{ ok: true, actionId?, version?, eventId? }` or `{ ok: false, error }`. Errors have a stable code, safe message, optional requestId and latestVersion. Codes are exported in errorSchema.
 
-Part 4 must atomically compare expectedVersion, check actionId, and commit the new state with its accepted-action record and terminal outbox when applicable. An identical retry returns the recorded result; a reused ID with a different payload is rejected. Stale versions request a fresh snapshot. Acknowledgement timeout means unknown outcome, so retry with the same actionId. Discard older snapshots and resync after gaps. Private snapshots are sent per recipient, not broadcast wholesale to a room.
+Part 4 atomically compares expectedVersion, checks actionId, and commits the new state with its accepted-action record and terminal outbox when applicable. An identical retry returns the recorded result; a reused ID with a different payload is rejected. Stale versions request a fresh snapshot. Acknowledgement timeout means unknown outcome, so retry with the same actionId. Discard older snapshots and resync after gaps. Private snapshots are sent per recipient, not broadcast wholesale to a room.
 
 ## Part 1 REST and worker health
 
-GET `/health/live`: 200 when the process can serve a request, independent of dependencies. GET `/health/ready`: 200 when Redis responds and MongoDB is a writable replica-set primary; 503 during dependency failure or shutdown. The worker uses the same paths on its separate port and its live response identifies jobs as not implemented.
+GET `/health/live`: 200 when the process can serve a request, independent of dependencies. GET `/health/ready`: 200 when Redis responds and MongoDB is a writable replica-set primary; 503 during dependency failure or shutdown. The worker uses the same paths on its separate port and its live response identifies turn, disconnect and result processing.
 
 The API generates a UUID request ID unless a safe 1-80 character caller ID is supplied. It returns it in `x-request-id`, rejects origins outside configuration, restricts JSON size, and never echoes rejected bodies or connection strings. The frontend `/api` prefix proxies to the API in both development and preview.
 
 ## Verification limits
 
-Fixtures are deterministic examples, not a playable catalog or live data. Part 1 tests schema strictness and lifecycle shapes. Step 2 verifies authentication and deck persistence; Step 3 verifies engine legality and hidden-information projection. Online concurrency, retransmission and durable result delivery remain Step 4 gates. See part-3-transport.md for local practice semantics.
+Fixtures are deterministic examples, not a playable catalog or live data. Part 1 tests schema strictness and lifecycle shapes. Step 2 verifies authentication and deck persistence; Step 3 verifies engine legality and hidden-information projection. Step 4 verifies online concurrency, retransmission, process crashes and durable result delivery; see part-4-report.md. See part-3-transport.md for local practice semantics.

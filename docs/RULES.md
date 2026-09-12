@@ -1,6 +1,6 @@
 # Mythic Arena rules — version 1
 
-These are the implementation contract for the first casual 1v1 release. Part 1 defines these rules; Step 3 implements the gameplay engine. R13?R14 online disconnect/readiness scheduling remains Step 4; local practice starts immediately.
+These are the implementation contract for the first casual 1v1 release. Step 3 implements gameplay; Step 4 adds online readiness, disconnect scheduling and persisted results. Local practice starts immediately.
 
 | ID  | Rule                                                                                                                                                                                                                                                                                                                                                                          |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

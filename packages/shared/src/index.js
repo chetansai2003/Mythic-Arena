@@ -386,3 +386,39 @@ export const catalogResponseSchema = z.strictObject({
     }),
   ),
 });
+
+export const historyResponseSchema = z.strictObject({
+  matches: z
+    .array(
+      z.strictObject({
+        id: idSchema,
+        mode: z.literal('CASUAL'),
+        rulesVersion: z.literal(RULES_VERSION),
+        players: z
+          .array(
+            z.strictObject({
+              id: idSchema,
+              displayName: z.string().min(1).max(40),
+            }),
+          )
+          .length(2),
+        outcome: outcomeSchema,
+        createdAt: timestamp,
+        startedAt: timestamp.nullable(),
+        endedAt: timestamp,
+        turns: count.max(LIMITS.turns),
+      }),
+    )
+    .max(50),
+});
+export const leaderboardResponseSchema = z.strictObject({
+  players: z
+    .array(
+      z.strictObject({
+        id: idSchema,
+        displayName: z.string().min(1).max(40),
+        wins: count,
+      }),
+    )
+    .max(50),
+});

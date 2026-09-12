@@ -21,6 +21,7 @@ export function createGameService({
   config,
   deckService,
   now = Date.now,
+  afterPersist = async () => {},
 }) {
   const store = createRedisGameStore(dependencies.redis, config.GAME_PREFIX);
   const db = dependencies.mongo.db(config.MONGODB_DB);
@@ -33,7 +34,7 @@ export function createGameService({
       players: reservation.entrants.map((entry) => ({
         id: entry.id,
         displayName: entry.displayName,
-        cards: entry.cards,
+        cards: JSON.parse(entry.cardsJson),
       })),
     });
     const firstPlayerId = state.turn.playerId;
@@ -70,21 +71,19 @@ export function createGameService({
       );
     else {
       // A durable membership receipt exists before either client can start play.
-      await db
-        .collection('active_matches')
-        .updateOne(
-          { _id: state.gameId },
-          {
-            $setOnInsert: {
-              players: state.players.map((p) => ({
-                id: p.id,
-                displayName: p.displayName,
-              })),
-              createdAt: reservation.createdAt,
-            },
+      await db.collection('active_matches').updateOne(
+        { _id: state.gameId },
+        {
+          $setOnInsert: {
+            players: state.players.map((p) => ({
+              id: p.id,
+              displayName: p.displayName,
+            })),
+            createdAt: reservation.createdAt,
           },
-          { upsert: true },
-        );
+        },
+        { upsert: true },
+      );
     }
     return record;
   }
@@ -213,6 +212,7 @@ export function createGameService({
         (record) => {
           member(record, userId);
           if (record.state.status !== 'INITIALIZING') return;
+          const alreadyReady = record.ready[userId];
           record.ready[userId] = true;
           const presence = record.presence[userId];
           presence.connected = true;
@@ -220,7 +220,7 @@ export function createGameService({
           presence.leaseEndsAt = now() + 6000;
           presence.disconnectEndsAt = null;
           record.state.players.find((p) => p.id === userId).connected = true;
-          record.state.version++;
+          if (!alreadyReady) record.state.version++;
           if (
             record.state.players.every(
               (p) => record.ready[p.id] && record.presence[p.id].connected,
@@ -406,6 +406,7 @@ export function createGameService({
       } finally {
         await session.endSession();
       }
+      await afterPersist(gameId);
       await update(gameId, (next) => {
         if (next.state.resultStatus !== 'PERSISTED') {
           next.state.resultStatus = 'PERSISTED';
@@ -415,41 +416,59 @@ export function createGameService({
     },
     async work() {
       await store.pruneQueue(now());
+      const errors = [];
+      const attempt = async (operation) => {
+        try {
+          await operation();
+        } catch (error) {
+          errors.push(error);
+        }
+      };
       // Rebuild schedule scores from state. Stale/missing scheduler entries never
       // become an alternate source of truth; CAS rechecks every transition.
       for (const gameId of await store.games()) {
-        const { raw, record } = await store.read(gameId);
-        if (!record) {
-          await update(gameId);
-          continue;
-        }
-        const deadline = deadlineOf(record);
-        if (deadline !== null)
-          await store.redis.zAdd(store.key('due'), {
-            score: deadline,
-            value: gameId,
-          });
-        if (!raw) continue;
+        await attempt(async () => {
+          const { record } = await store.read(gameId);
+          if (!record) {
+            await update(gameId);
+            return;
+          }
+          const deadline = deadlineOf(record);
+          if (deadline !== null)
+            await store.redis.zAdd(store.key('due'), {
+              score: deadline,
+              value: gameId,
+            });
+        });
       }
-      for (const gameId of await store.due(now())) await update(gameId);
+      for (const gameId of await store.due(now()))
+        await attempt(() => update(gameId));
       // Recover known active matches after Redis state loss; abort without wins.
-      for (const active of await db
-        .collection('active_matches')
-        .find({})
-        .limit(100)
-        .toArray()) {
-        if (!(await store.read(active._id)).record) await update(active._id);
-      }
+      await attempt(async () => {
+        for (const active of await db
+          .collection('active_matches')
+          .find({})
+          .limit(100)
+          .toArray()) {
+          await attempt(async () => {
+            if (!(await store.read(active._id)).record)
+              await update(active._id);
+          });
+        }
+      });
       for (const gameId of (await store.outbox()).slice(0, 20))
-        await this.persist(gameId);
+        await attempt(() => this.persist(gameId));
+      if (errors.length)
+        throw new AggregateError(errors, 'Game jobs require retry.');
     },
     async history(userId) {
-      return db
+      const matches = await db
         .collection('matches')
         .find({ 'players.id': userId })
         .sort({ endedAt: -1 })
         .limit(50)
         .toArray();
+      return matches.map(({ _id, ...match }) => ({ id: _id, ...match }));
     },
   };
 }

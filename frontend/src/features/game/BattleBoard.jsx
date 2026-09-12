@@ -5,7 +5,12 @@ import { Button, Dialog, StatusBanner } from '../../components/index.jsx';
 
 const sameTarget = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-export default function BattleBoard({ transport, catalog, onRestart }) {
+export default function BattleBoard({
+  transport,
+  catalog,
+  onRestart,
+  online = false,
+}) {
   const [feed, setFeed] = useState(() => transport.getSnapshot());
   const [selection, setSelection] = useState(null);
   const [surrender, setSurrender] = useState(false);
@@ -30,7 +35,7 @@ export default function BattleBoard({ transport, catalog, onRestart }) {
               CARD_PLAYED: 'Card played.',
               ATTACK_RESOLVED: 'Attack resolved.',
               TURN_STARTED: 'A new turn begins.',
-              MATCH_ENDED: 'Practice complete.',
+              MATCH_ENDED: 'Match complete.',
             }[event.type],
           );
         }
@@ -45,7 +50,11 @@ export default function BattleBoard({ transport, catalog, onRestart }) {
     return () => clearInterval(timer);
   }, [transport]);
   const { snapshot: view, connection, error } = feed;
-  const busy = connection === 'pending' || connection === 'resyncing';
+  const busy = !['ready', 'rejected'].includes(connection);
+  const clockOffset = useMemo(
+    () => view.serverNow - Date.now(),
+    [view.serverNow],
+  );
   const active = view.status === 'ACTIVE';
   const yourTurn = active && view.turn.playerId === view.self.id;
   const definitions = useMemo(
@@ -97,17 +106,21 @@ export default function BattleBoard({ transport, catalog, onRestart }) {
     view.outcome?.kind === 'DRAW'
       ? 'A worthy draw'
       : view.outcome?.kind === 'ABORT'
-        ? 'Practice ended'
+        ? online
+          ? 'Match ended'
+          : 'Practice ended'
         : view.outcome?.winnerId === view.self.id
           ? 'Victory'
           : 'Defeat';
   const remaining = view.turn
-    ? Math.max(0, Math.ceil((view.turn.endsAt - clock) / 1000))
+    ? Math.max(0, Math.ceil((view.turn.endsAt - clock - clockOffset) / 1000))
     : 0;
   const instruction = !active
-    ? 'Practice is complete.'
+    ? 'Match complete.'
     : !yourTurn
-      ? 'The apprentice is thinking. You can inspect your cards.'
+      ? online
+        ? 'Your opponent is choosing a move.'
+        : 'The apprentice is thinking. You can inspect your cards.'
       : selectedCard
         ? selectedCard.definition.kind === 'UNIT'
           ? options.length
@@ -127,7 +140,11 @@ export default function BattleBoard({ transport, catalog, onRestart }) {
       <div className={`battle-hero ${own ? 'friendly' : 'enemy'}`}>
         <div>
           <span className="eyebrow">
-            {own ? 'YOUR HERO' : 'PRACTICE OPPONENT'}
+            {own
+              ? 'YOUR HERO'
+              : online
+                ? 'ONLINE OPPONENT'
+                : 'PRACTICE OPPONENT'}
           </span>
           <h2>{player.displayName}</h2>
         </div>
@@ -145,6 +162,9 @@ export default function BattleBoard({ transport, catalog, onRestart }) {
             {own ? '' : ` · ${player.handCount} in hand`}
           </span>
           {player.shield && <span>Shield active</span>}
+          {online && !player.connected && (
+            <span>Disconnected · 30-second reconnect window</span>
+          )}
         </div>
         {options.some((action) => action.payload.target) && (
           <button
@@ -223,7 +243,11 @@ export default function BattleBoard({ transport, catalog, onRestart }) {
     <div className="battle-screen">
       <div className="battle-toolbar">
         <div>
-          <p className="eyebrow">LOCAL PRACTICE · NO RANKING CREDIT</p>
+          <p className="eyebrow">
+            {online
+              ? 'CASUAL ONLINE · SERVER CLOCK'
+              : 'LOCAL PRACTICE · NO RANKING CREDIT'}
+          </p>
           <h1>Battle arena</h1>
         </div>
         <Button
@@ -338,18 +362,21 @@ export default function BattleBoard({ transport, catalog, onRestart }) {
         </div>
       )}
       <p className="battle-note">
-        Practice runs in this tab. Reloading or leaving ends it; no result is
-        saved to your account. Use Tab and Enter to select, summon, target, or
-        end your turn.
+        {online
+          ? 'The server owns this match. Turns continue during a disconnect; return within 30 seconds. Restore the board after reconnect before choosing a move.'
+          : 'Practice runs in this tab. Reloading or leaving ends it; no result is saved to your account. Use Tab and Enter to select, summon, target, or end your turn.'}
       </p>
       <Dialog
         open={surrender}
         onClose={() => setSurrender(false)}
-        title="Surrender this practice match?"
+        title={
+          online ? 'Surrender this match?' : 'Surrender this practice match?'
+        }
       >
         <p>
-          The apprentice wins this practice. Your saved decks and account record
-          stay unchanged.
+          {online
+            ? 'Your opponent will win this casual match.'
+            : 'The apprentice wins this practice. Your saved decks and account record stay unchanged.'}
         </p>
         <Button variant="secondary" onClick={() => setSurrender(false)}>
           Keep playing
@@ -375,10 +402,18 @@ export default function BattleBoard({ transport, catalog, onRestart }) {
               ? 'The match ended by surrender.'
               : view.outcome?.kind === 'DRAW'
                 ? 'Both heroes fell in the same resolution.'
-                : 'A hero has fallen.'}{' '}
-          This was a practice match. No leaderboard points were awarded.
+                : view.outcome?.kind === 'ABORT'
+                  ? 'The match was aborted without a win.'
+                  : view.outcome?.reason === 'DISCONNECT'
+                    ? 'The reconnect deadline expired.'
+                    : 'A hero has fallen.'}{' '}
+          {online
+            ? view.resultStatus === 'PERSISTED'
+              ? 'Result saved.'
+              : 'Saving result. It will appear in history when storage is available.'
+            : 'This was a practice match. No leaderboard points were awarded.'}
         </p>
-        <Button onClick={onRestart}>Practice again</Button>
+        {!online && <Button onClick={onRestart}>Practice again</Button>}
         <Link className="button button-secondary" to="/lobby">
           Return to lobby
         </Link>

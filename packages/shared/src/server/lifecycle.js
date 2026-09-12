@@ -19,16 +19,23 @@ export async function startService({
     throw error;
   }
   const server = createServer(handler);
-  const cleanup = await configureServer?.({ server, dependencies, lifecycle });
+  let cleanup;
   server.requestTimeout = 5000;
   server.headersTimeout = 5000;
-  await new Promise((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(port, config.HOST, resolve);
-  }).catch(async (error) => {
-    await dependencies.close();
+  try {
+    cleanup = await configureServer?.({ server, dependencies, lifecycle });
+    await new Promise((resolve, reject) => {
+      server.once('error', reject);
+      server.listen(port, config.HOST, resolve);
+    });
+  } catch (error) {
+    try {
+      await cleanup?.();
+    } finally {
+      await dependencies.close();
+    }
     throw error;
-  });
+  }
   logger.info({ port }, 'Service listening');
   let closing;
   const shutdown = () => {

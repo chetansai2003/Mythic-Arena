@@ -5,6 +5,7 @@ import { Layers3, ArrowRight } from 'lucide-react';
 import { deckListSchema } from '@mythic/shared';
 import { useApi } from '../../hooks/api-context.jsx';
 import { Button, Skeleton, StatusBanner } from '../../components/index.jsx';
+import OnlineLobby from '../matchmaking/OnlineLobby.jsx';
 
 export default function LobbyDecks() {
   const user = useSelector((state) => state.session.user);
@@ -122,6 +123,7 @@ export default function LobbyDecks() {
           Practice with deck
         </Link>
       )}
+      <OnlineLobby deckId={state.selected} />
     </div>
   );
 }

@@ -111,7 +111,7 @@ export function Layout() {
           </button>
           <div className="sidebar-footer">
             <span className="status-dot" />
-            VERSION 0.3 <span>PART 03</span>
+            VERSION 0.4 <span>PART 04</span>
           </div>
         </div>
       </aside>

@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Flame,
   Layers3,
-  LockKeyhole,
   Shield,
   Sparkles,
   Swords,
@@ -136,10 +135,10 @@ export default function Lobby({ home = false }) {
               A worthy opponent. A fresh strategy.
               <br /> Your next story starts across the board.
             </p>
-            <button className="mode-action" disabled>
-              <LockKeyhole size={14} /> Matchmaking coming soon{' '}
+            <a className="mode-action" href="#online-queue">
+              <Swords size={14} /> Choose a deck to find an opponent{' '}
               <ArrowRight size={16} />
-            </button>
+            </a>
           </article>
           <article className="mode-card">
             <div className="mode-top">

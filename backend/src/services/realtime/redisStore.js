@@ -96,7 +96,8 @@ export function createRedisGameStore(redis, prefix) {
       const entry = {
         id: user.id,
         displayName: user.displayName,
-        cards,
+        // Keep nested arrays opaque to Redis Lua cjson (which encodes [] as {}).
+        cardsJson: JSON.stringify(cards),
         token,
         queuedAt: now,
         expiresAt: now + 6000,

@@ -42,3 +42,4 @@ try {
   await browser.close();
 }
 console.log('Captured live practice and maximum-capacity component layouts.');
+/* global document, window */

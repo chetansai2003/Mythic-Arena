@@ -10,7 +10,17 @@ import {
 } from 'lucide-react';
 import { EmptyState, Toast } from '../../components/index.jsx';
 import PageHeading from '../../components/PageHeading.jsx';
+import { lazy, Suspense } from 'react';
+import { useOnline } from '../../hooks/online-context.jsx';
+const OnlineMatch = lazy(() => import('./OnlineMatch.jsx'));
 export default function MatchPage() {
+  const online = useOnline();
+  if (online?.client)
+    return (
+      <Suspense fallback={<p role="status">Loading battle…</p>}>
+        <OnlineMatch />
+      </Suspense>
+    );
   return (
     <div className="page">
       <PageHeading eyebrow="THE BATTLEFIELD" title="Battle arena">
@@ -26,9 +36,8 @@ export default function MatchPage() {
             </Link>
           }
         >
-          Online matches arrive with the multiplayer milestone. You can play
-          against the apprentice in <Link to="/practice">Practice grounds</Link>{' '}
-          now.
+          Sign in and find an opponent in the lobby, or play against the
+          apprentice in <Link to="/practice">Practice grounds</Link>.
         </EmptyState>
       </div>
     </div>

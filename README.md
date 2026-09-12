@@ -1,6 +1,6 @@
 # Mythic Arena
 
-A JavaScript 1v1 card-game project. Parts 1?3 provide accounts, an original 20-card catalog, persistent deck building, a deterministic rules engine, and a complete 2D practice game. Online matchmaking remains Step 4.
+A JavaScript 1v1 card game. Parts 1?4 provide accounts, deck building, practice, authenticated online matchmaking, server-controlled battles, reconnect recovery, and saved match results.
 
 ## Run locally
 
@@ -12,7 +12,7 @@ npm run setup
 docker compose -f docker-compose.yml up -d --build --wait
 ```
 
-Open **http://localhost:5173/lobby**. Create an account using a password of at least 12 characters, open My decks, name a deck, use the starter list or select 30 cards, and save. No accounts or passwords are seeded. All 20 original cards are available to every account. Open **http://localhost:5173/practice** for a guest starter match, or select a saved deck in the lobby and choose Practice with deck. Practice runs in one browser tab against a legal-action bot and never awards account wins.
+Open **http://localhost:5173/lobby**. For online play, use two separate browser profiles with different accounts: save a deck in each, choose Find an opponent, then both choose Ready to battle within ten seconds. Create an account using a password of at least 12 characters, open My decks, name a deck, use the starter list or select 30 cards, and save. No accounts or passwords are seeded. All 20 original cards are available to every account. Open **http://localhost:5173/practice** for a guest starter match, or select a saved deck in the lobby and choose Practice with deck. Practice runs in one browser tab against a legal-action bot and never awards account wins.
 
 `npm run setup` creates a local `.env` and a random authentication secret without printing it. It preserves existing configuration and replaces only an absent or placeholder secret. Never commit `.env`. Compose initializes a MongoDB replica set and runs the idempotent catalog/index setup as a separate one-shot service before starting the API.
 
@@ -100,3 +100,5 @@ Access tokens stay in memory. Refresh tokens are random, hashed in MongoDB, rota
 - The GitHub workflow is configured, but a remote CI pass exists only after publishing a repository and actually running it. No remote repository or production deployment is created by this implementation.
 
 See [folder architecture](docs/ARCHITECTURE.md), [deployment](docs/DEPLOYMENT.md), [rules](docs/RULES.md), [decisions](docs/DECISIONS.md), [shared contracts](docs/contracts.md), [account/deck API](docs/part-2-api.md), [Part 1 evidence](docs/part-1-report.md), and [Part 2 evidence](docs/part-2-report.md), and [Step 3 evidence](docs/part-3-report.md).
+
+Step 4 behavior and verification: [online reliability report](docs/part-4-report.md).

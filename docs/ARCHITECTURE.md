@@ -10,11 +10,12 @@ frontend/
     pages/                      Home, Login, Register, Lobby, DeckBuilder,
                                 Game, MatchHistory, Leaderboard, Settings
     features/{auth,decks}/      Shared account and deck UI
-    features/{game,matchmaking}/ Reserved for future milestones
+    features/{game,matchmaking}/ Practice/online board, results and queue UI
     three/                      Current SVG scene; future interactive 3D
     services/api.js             Fetch client, CSRF and session coordination
+    services/socket.js          Online connection, acknowledgements and resync
     store/                      Redux session and device preferences
-    hooks/                      API context
+    hooks/                      API and authenticated online contexts
     utils/
     styles/
     App.jsx                     Shared application layout and error pages
@@ -30,7 +31,8 @@ backend/
     middleware/                 Authentication, cookie/CSRF security, throttles
     services/                   Auth and deck business rules
       gameEngine/               Isolated pure engine workspace
-    sockets/                    Reserved for multiplayer
+      realtime/                 Redis CAS, lifecycle, queue and result service
+    sockets/                    Authenticated Socket.IO server
     workers/                    Separate worker process workspace
     utils/                      Safe errors and input parsing
     app.js
@@ -52,6 +54,6 @@ The worker remains a separate process even though its workspace is under `backen
 
 Tailwind 4 is configured through the Vite plugin and CSS theme declarations; a redundant Tailwind JavaScript config is unnecessary. No TypeScript configs or `.ts`/`.tsx` application files are needed.
 
-Parts 1?3 provide the application shell, accounts, catalog, persistent decks, pure game rules and a local 2D practice match with a bot. Socket.IO, durable timers, persisted match results, rankings and interactive 3D remain later milestones. Reserved folders contain no pretend implementations.
+Parts 1–4 provide the shell, accounts, decks, practice and online matches. Redis holds private live state, controller leases, queue reservations, durable deadline scores, action receipts and the terminal outbox. MongoDB stores active membership and transactionally persists unique match receipts with winner increments. API and worker use the same compare-and-set transitions. Only the API projects private per-player snapshots. Interactive 3D and production release remain later milestones.
 
 See [rules](RULES.md), [API and events](API_EVENTS.md), [deployment](DEPLOYMENT.md), and [decisions](DECISIONS.md).

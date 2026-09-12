@@ -22,6 +22,8 @@ Implemented September 11, 2026 in JavaScript/JSX, preserving the requested front
 | Production frontend build       | Passed; initial JS 485.95 kB / 151.46 kB gzip; lazy practice JS 21.19 kB / 7.66 kB gzip  |
 | Clean Linux image build         | `npm ci` and production build passed                                                     |
 
+The final Step 3 unit/component run passed 87 tests. Full-stack smoke and the real Redis stop/restart recovery check passed. Captured evidence: [desktop](evidence/part-3-desktop.png), [phone](evidence/part-3-phone.png), [maximum desktop](evidence/part-3-maximum-desktop.png), and [maximum phone](evidence/part-3-maximum-phone.png).
+
 The browser suite also exercised a saved owned deck, catalog failure followed by retry, card inspection, confirmed/cancelled surrender and practice restart. Keyboard journeys use Tab/Enter and advance an injected browser clock to avoid waiting real minutes; they summon a unit, end turns and reach a natural terminal result through the bot/engine. They do not call hidden engine hooks or surrender to manufacture completion.
 
 Maximum-capacity layout evidence uses server-rendered real React components with a deterministic fixture inside the actual application layout. This separate visual fixture is not a production route and is not evidence of interactive gameplay; the live practice journeys provide that evidence.

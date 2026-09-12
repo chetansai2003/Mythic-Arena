@@ -2,7 +2,7 @@ import { LIMITS } from '@mythic/shared';
 import { advanceTurn } from '@mythic/game-engine';
 
 export function deadlineOf(record) {
-  if (record.kind === 'RESERVED') return record.readyEndsAt;
+  if (record.kind === 'RESERVED') return record.createdAt;
   if (record.state.status === 'TERMINAL') return null;
   const times = [
     record.state.status === 'INITIALIZING'

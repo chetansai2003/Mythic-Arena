@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { EmptyState, Toast } from '../../components/index.jsx';
 import PageHeading from '../../components/PageHeading.jsx';
+import ResultsList from '../../features/game/ResultsList.jsx';
 export default function Leaderboard() {
   return (
     <div className="page">
@@ -17,10 +18,7 @@ export default function Leaderboard() {
         Earn your place, one victory at a time.
       </PageHeading>
       <div className="content-panel">
-        <EmptyState icon={Crown} title="The first legends are yet to rise">
-          The release leaderboard will count wins in casual online matches.
-          Rankings become available with completed match results.
-        </EmptyState>
+        <ResultsList />
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { EmptyState, Toast } from '../../components/index.jsx';
 import PageHeading from '../../components/PageHeading.jsx';
+import ResultsList from '../../features/game/ResultsList.jsx';
 export default function HistoryPage() {
   return (
     <div className="page">
@@ -17,10 +18,7 @@ export default function HistoryPage() {
         A record of every hard-fought battle.
       </PageHeading>
       <div className="content-panel">
-        <EmptyState icon={History} title="Your chronicle awaits">
-          Completed matches will appear here once online play is available. No
-          matches have been played in this preview.
-        </EmptyState>
+        <ResultsList history />
       </div>
     </div>
   );

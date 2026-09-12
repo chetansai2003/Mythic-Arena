@@ -7,6 +7,7 @@ import { routes } from './routes.jsx';
 import './styles/styles.css';
 import './styles/decks.css';
 import { ApiProvider } from './hooks/api-context.jsx';
+import { OnlineProvider } from './hooks/online-context.jsx';
 
 let storage;
 try {
@@ -18,7 +19,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={createAppStore(storage)}>
       <ApiProvider>
-        <RouterProvider router={createBrowserRouter(routes)} />
+        <OnlineProvider>
+          <RouterProvider router={createBrowserRouter(routes)} />
+        </OnlineProvider>
       </ApiProvider>
     </Provider>
   </StrictMode>,

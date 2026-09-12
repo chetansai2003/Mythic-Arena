@@ -41,6 +41,7 @@ import {
 import ArenaArt from './three/ArenaArt.jsx';
 import LobbyDecks from './features/decks/LobbyDecks.jsx';
 import PageHeading from './components/PageHeading.jsx';
+import { muteAudio, unlockAudio } from './three/effects/audio.js';
 
 const navigation = [
   { to: '/lobby', label: 'The arena', icon: LayoutDashboard },
@@ -53,6 +54,19 @@ export function Layout() {
   const prefs = useSelector((state) => state.preferences);
   const user = useSelector((state) => state.session.user);
   const location = useLocation();
+  useEffect(() => {
+    if (prefs.muted) {
+      muteAudio();
+      return;
+    }
+    const unlock = () => unlockAudio();
+    document.addEventListener('pointerdown', unlock, { once: true });
+    document.addEventListener('keydown', unlock, { once: true });
+    return () => {
+      document.removeEventListener('pointerdown', unlock);
+      document.removeEventListener('keydown', unlock);
+    };
+  }, [prefs.muted]);
   useEffect(() => {
     document.documentElement.dataset.motion = prefs.reduceMotion
       ? 'reduced'
@@ -111,7 +125,7 @@ export function Layout() {
           </button>
           <div className="sidebar-footer">
             <span className="status-dot" />
-            VERSION 0.4 <span>PART 04</span>
+            VERSION 0.5 <span>PART 05</span>
           </div>
         </div>
       </aside>

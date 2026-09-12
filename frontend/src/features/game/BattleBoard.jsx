@@ -2,6 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { legalActions } from '@mythic/game-engine';
 import { Button, Dialog, StatusBanner } from '../../components/index.jsx';
+import BattleEffects from '../../three/effects/BattleEffects.jsx';
+import CardReveal, { useCardTilt } from '../../three/CardReveal.jsx';
+import VictoryCrest from '../../three/VictoryCrest.jsx';
+import FirstMatchGuide from './FirstMatchGuide.jsx';
 
 const sameTarget = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -15,6 +19,8 @@ export default function BattleBoard({
   const [selection, setSelection] = useState(null);
   const [surrender, setSurrender] = useState(false);
   const [resultOpen, setResultOpen] = useState(true);
+  const [inspect, setInspect] = useState(false);
+  const tilt = useCardTilt();
   const [clock, setClock] = useState(Date.now());
   const seenEvents = useRef(new Set());
   const [eventKey, setEventKey] = useState('initial');
@@ -29,7 +35,16 @@ export default function BattleBoard({
         if (event && !seenEvents.current.has(event.eventId)) {
           seenEvents.current.add(event.eventId);
           setEventKey(event.eventId);
-          setSelection(null);
+          setSelection((current) => {
+            if (!current) return null;
+            const items =
+              current.kind === 'CARD'
+                ? update.snapshot.self.hand
+                : update.snapshot.self.board;
+            return items.some((item) => item.instanceId === current.id)
+              ? current
+              : null;
+          });
           setLastEvent(
             {
               CARD_PLAYED: 'Card played.',
@@ -302,13 +317,21 @@ export default function BattleBoard({
       </p>
       {heroPanel(view.opponent, false)}
       {row(view.opponent, false)}
-      <div className="battle-divider">THE FIELD OF LEGENDS</div>
+      <div className="battle-divider">
+        <span>THE FIELD OF LEGENDS</span>
+        <BattleEffects feed={feed} catalog={catalog} />
+      </div>
       {row(view.self, true)}
       {heroPanel(view.self, true)}
       <div className="battle-guidance">
         <p>{instruction}</p>
         {selection && (
           <button onClick={() => setSelection(null)}>Clear selection</button>
+        )}
+        {selectedCard && (
+          <Button variant="secondary" onClick={() => setInspect(true)}>
+            Inspect selected card
+          </Button>
         )}
         {selectedCard?.definition.kind === 'UNIT' && (
           <Button
@@ -322,6 +345,7 @@ export default function BattleBoard({
       <section aria-label="Your hand" className="battle-hand">
         {view.self.hand.map((card) => (
           <button
+            {...tilt}
             key={card.instanceId}
             className={`hand-card ${selection?.id === card.instanceId ? 'selected' : ''}`}
             aria-pressed={selection?.id === card.instanceId}
@@ -361,6 +385,52 @@ export default function BattleBoard({
           </p>
         </div>
       )}
+      {active && <FirstMatchGuide />}
+      <Dialog
+        open={inspect && !!selectedCard}
+        onClose={() => setInspect(false)}
+        title={selectedCard?.definition.name ?? 'Card details'}
+      >
+        {selectedCard && (
+          <CardReveal card={selectedCard.definition}>
+            <div className="full-card-sheet">
+              <p className="eyebrow">
+                {selectedCard.definition.faction} ·{' '}
+                {selectedCard.definition.rarity}
+              </p>
+              <span className="sheet-rune" aria-hidden="true">
+                ✧
+              </span>
+              <h3>{selectedCard.definition.name}</h3>
+              <p>{selectedCard.definition.cost} energy</p>
+              {selectedCard.definition.kind === 'UNIT' ? (
+                <>
+                  <p>
+                    {selectedCard.definition.attack} attack ·{' '}
+                    {selectedCard.definition.health} health
+                  </p>
+                  <p>
+                    {selectedCard.definition.keywords.join(' · ') ||
+                      'No keywords'}
+                  </p>
+                  <p>
+                    Summon into an empty slot. Can attack once per turn,
+                    starting next turn.
+                  </p>
+                </>
+              ) : (
+                <p>
+                  {selectedCard.definition.effect.key.toLowerCase()}{' '}
+                  {selectedCard.definition.effect.amount ?? ''} ·{' '}
+                  {selectedCard.definition.effect.target
+                    .replaceAll('_', ' ')
+                    .toLowerCase()}
+                </p>
+              )}
+            </div>
+          </CardReveal>
+        )}
+      </Dialog>
       <p className="battle-note">
         {online
           ? 'The server owns this match. Turns continue during a disconnect; return within 30 seconds. Restore the board after reconnect before choosing a move.'
@@ -395,6 +465,7 @@ export default function BattleBoard({
         onClose={() => setResultOpen(false)}
         title={outcomeTitle}
       >
+        <VictoryCrest victory={view.outcome?.winnerId === view.self.id} />
         <p>
           {view.outcome?.reason === 'TURN_LIMIT'
             ? 'The 100-turn limit was reached.'

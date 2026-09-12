@@ -5,6 +5,7 @@ import { useOnline } from '../../hooks/online-context.jsx';
 import { useApi } from '../../hooks/api-context.jsx';
 import { Button, Skeleton, StatusBanner } from '../../components/index.jsx';
 import BattleBoard from '../../features/game/BattleBoard.jsx';
+import MatchPortal from '../../three/MatchPortal.jsx';
 import '../../styles/battle.css';
 
 export default function OnlineMatch() {
@@ -104,6 +105,11 @@ export default function OnlineMatch() {
       <div className="page">
         <p className="eyebrow">CASUAL ONLINE MATCH</p>
         <h1>Your opponent is here</h1>
+        <MatchPortal
+          self={snapshot.self.displayName}
+          opponent={snapshot.opponent.displayName}
+          gameId={gameId}
+        />
         <div className="content-panel">
           <h2>{snapshot.opponent.displayName}</h2>
           <p>

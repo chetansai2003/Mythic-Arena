@@ -27,6 +27,7 @@ import {
 } from '@mythic/shared';
 import { AccountGate } from '../../features/auth/Account.jsx';
 import { useApi } from '../../hooks/api-context.jsx';
+import CardReveal, { useCardTilt } from '../../three/CardReveal.jsx';
 import {
   Button,
   Dialog,
@@ -61,8 +62,10 @@ export function effectText(card) {
 }
 function CardFace({ card, onInspect }) {
   const { Icon, label } = factions[card.faction];
+  const tilt = useCardTilt();
   return (
     <button
+      {...tilt}
       className={`card-face faction-${card.faction.toLowerCase()}`}
       onClick={() => onInspect(card)}
       aria-label={`Inspect ${card.name}`}
@@ -643,18 +646,20 @@ function DeckEditor() {
         title={detail?.name ?? 'Card details'}
       >
         {detail && (
-          <div className="card-detail">
-            <CardFace card={detail} onInspect={() => {}} />
-            <p>{effectText(detail)}</p>
-            <p className="muted">
-              {factions[detail.faction].label} · {detail.rarity.toLowerCase()} ·{' '}
-              {detail.cost} energy
-            </p>
-            <p className="muted">
-              Available for deck building. Battle effects will be implemented
-              with the game engine.
-            </p>
-          </div>
+          <CardReveal card={detail}>
+            <div className="card-detail">
+              <CardFace card={detail} onInspect={() => {}} />
+              <p>{effectText(detail)}</p>
+              <p className="muted">
+                {factions[detail.faction].label} · {detail.rarity.toLowerCase()}{' '}
+                · {detail.cost} energy
+              </p>
+              <p className="muted">
+                Ready for practice and casual online battles. Select a card,
+                then choose a legal target during your turn.
+              </p>
+            </div>
+          </CardReveal>
         )}
       </Dialog>
       <Dialog

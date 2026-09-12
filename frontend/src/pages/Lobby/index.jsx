@@ -12,7 +12,7 @@ import {
   Wifi,
 } from 'lucide-react';
 import { Skeleton } from '../../components/index.jsx';
-import ArenaArt from '../../three/ArenaArt.jsx';
+import LobbyArena from '../../three/LobbyArena.jsx';
 import LobbyDecks from '../../features/decks/LobbyDecks.jsx';
 function ServiceStatus() {
   const [state, setState] = useState('loading');
@@ -44,7 +44,7 @@ function ServiceStatus() {
       <Wifi size={15} />
       <span>
         {state === 'ready'
-          ? 'Services connected · online play coming later'
+          ? 'Services connected · casual battles available'
           : 'Services unavailable · you can still explore'}
       </span>
       <button
@@ -109,7 +109,7 @@ export default function Lobby({ home = false }) {
             </span>
           </div>
         </div>
-        <ArenaArt />
+        <LobbyArena />
         <span className="hero-corner">I</span>
       </section>
       <LobbyDecks />

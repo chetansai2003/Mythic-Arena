@@ -38,8 +38,8 @@ export default function SettingsPage() {
           <div>
             <h3>Graphics quality</h3>
             <p>
-              Low removes ambient scenery motion. Future 3D scenes will respect
-              this choice.
+              High adds the floating 3D arena and cinematic effects. Low uses
+              static artwork and keeps every game control available.
             </p>
           </div>
           <select
@@ -74,8 +74,8 @@ export default function SettingsPage() {
               <Volume2 size={16} /> Mute sound
             </h3>
             <p>
-              Sound is off by default. Audio effects will arrive in a later
-              milestone.
+              Sound is off by default. Unmute for quiet tones on accepted moves;
+              sound starts after your next click or key press.
             </p>
           </div>
           <input

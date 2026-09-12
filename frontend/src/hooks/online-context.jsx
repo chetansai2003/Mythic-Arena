@@ -24,6 +24,8 @@ export function OnlineProvider({ children }) {
       unsubscribe = client.subscribe((feed) => {
         if (active) setOnline({ client, feed, userId });
       });
+    }).catch(() => {
+      if (active) setOnline({ userId, client: null, feed: { error: { message: 'Online play could not load. Reload to reconnect.' } } });
     });
     return () => {
       active = false;

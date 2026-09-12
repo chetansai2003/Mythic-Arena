@@ -16,6 +16,7 @@ export default function OnlineLobby({ deckId }) {
   }, [found, navigate]);
   if (!online) return <p role="status">Connecting to online play…</p>;
   const { client, feed } = online;
+  if (!client) return <StatusBanner kind="error" action={<Button onClick={() => window.location.reload()}>Reload connection</Button>}>{feed.error.message}</StatusBanner>;
   if (feed.connection === 'conflict')
     return (
       <StatusBanner

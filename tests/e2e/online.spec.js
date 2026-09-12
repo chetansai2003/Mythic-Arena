@@ -40,6 +40,31 @@ test('two browsers match, move, reconnect, finish, and see persisted results', a
   });
   try {
     const beta = await other.newPage();
+    for (const player of [page, beta]) {
+      if (testInfo.project.name === 'desktop') {
+        await player.addInitScript(() =>
+          localStorage.setItem(
+            'mythic.preferences.v1',
+            JSON.stringify({
+              graphics: 'low',
+              reduceMotion: false,
+              muted: true,
+            }),
+          ),
+        );
+      } else if (testInfo.project.name === 'laptop') {
+        // An optional scene request can remain pending for the entire match.
+        await player.route('**/assets/ArenaScene-*.js', () => {});
+      } else {
+        await player.addInitScript(() => {
+          const original = HTMLCanvasElement.prototype.getContext;
+          HTMLCanvasElement.prototype.getContext = function (kind, ...args) {
+            if (String(kind).startsWith('webgl')) return null;
+            return original.call(this, kind, ...args);
+          };
+        });
+      }
+    }
     await Promise.all([
       prepare(page, 'Online Alpha'),
       prepare(beta, 'Online Beta'),
@@ -81,7 +106,7 @@ test('two browsers match, move, reconnect, finish, and see persisted results', a
     ).toBeEnabled();
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await page.screenshot({
-      path: `docs/evidence/part-4-${testInfo.project.name}.png`,
+      path: `docs/evidence/part-5-battle-${testInfo.project.name}.png`,
       fullPage: true,
     });
     await page.getByRole('button', { name: 'Surrender', exact: true }).click();

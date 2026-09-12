@@ -31,7 +31,7 @@ test('lobby renders honestly, navigation and direct refresh work', async ({
     page.getByRole('link', { name: /Choose a deck to find an opponent/ }),
   ).toBeVisible();
   await expect(
-    page.getByText('Services connected · online play coming later'),
+    page.getByText('Services connected · casual battles available'),
   ).toBeVisible();
   await page.screenshot({
     path: testInfo.outputPath('lobby.png'),
@@ -140,7 +140,7 @@ test('connection failure has an actionable recovery', async ({ page }) => {
   );
   await page.getByRole('button', { name: 'Check again' }).click();
   await expect(
-    page.getByText('Services connected · online play coming later'),
+    page.getByText('Services connected · casual battles available'),
   ).toBeVisible();
 });
 test('all screen shells are reachable without overflow', async ({ page }) => {

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { format } from 'prettier';
 test.use({ trace: 'off' }); // Keep trace capture overhead out of frame samples.
 
 test('3D arena renders, handles context loss, and honors graphics preferences', async ({
@@ -39,7 +40,7 @@ test('3D arena renders, handles context loss, and honors graphics preferences', 
   await mkdir('docs/evidence', { recursive: true });
   await writeFile(
     `docs/evidence/part-5-performance-${testInfo.project.name}.json`,
-    JSON.stringify(performanceSample, null, 2) + '\n',
+    await format(JSON.stringify(performanceSample), { parser: 'json' }),
   );
   await page.evaluate(() => {
     Object.defineProperty(document, 'hidden', {
@@ -111,9 +112,15 @@ test('battle tips and full card sheet work with keyboard and reduced motion', as
   await inspect.focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('dialog[open] .full-card-sheet')).toBeVisible();
+  const bounds = await page.locator('dialog[open]').boundingBox();
+  expect(
+    Math.abs(bounds.x + bounds.width / 2 - page.viewportSize().width / 2),
+  ).toBeLessThan(2);
+  expect(bounds.y).toBeGreaterThanOrEqual(8);
+  expect(bounds.height).toBeLessThanOrEqual(page.viewportSize().height - 16);
   await page.screenshot({
     path: `docs/evidence/part-5-card-${testInfo.project.name}.png`,
-    fullPage: true,
+    fullPage: false,
   });
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.keyboard.press('Escape');

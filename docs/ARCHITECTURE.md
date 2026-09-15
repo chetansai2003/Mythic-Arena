@@ -11,7 +11,7 @@ frontend/
                                 Game, MatchHistory, Leaderboard, Settings
     features/{auth,decks}/      Shared account and deck UI
     features/{game,matchmaking}/ Practice/online board, results and queue UI
-    three/                      Current SVG scene; future interactive 3D
+    three/                      Optional R3F arena, GSAP moments, SVG fallback
     services/api.js             Fetch client, CSRF and session coordination
     services/socket.js          Online connection, acknowledgements and resync
     store/                      Redux session and device preferences
@@ -54,6 +54,6 @@ The worker remains a separate process even though its workspace is under `backen
 
 Tailwind 4 is configured through the Vite plugin and CSS theme declarations; a redundant Tailwind JavaScript config is unnecessary. No TypeScript configs or `.ts`/`.tsx` application files are needed.
 
-Parts 1–4 provide the shell, accounts, decks, practice and online matches. Redis holds private live state, controller leases, queue reservations, durable deadline scores, action receipts and the terminal outbox. MongoDB stores active membership and transactionally persists unique match receipts with winner increments. API and worker use the same compare-and-set transitions. Only the API projects private per-player snapshots. Interactive 3D and production release remain later milestones.
+Parts 1–4 provide the shell, accounts, decks, practice and online matches. Redis holds private live state, controller leases, queue reservations, durable deadline scores, action receipts and the terminal outbox. MongoDB stores active membership and transactionally persists unique match receipts with winner increments. API and worker use the same compare-and-set transitions. Only the API projects private per-player snapshots. Step 5 adds optional lazy 3D and cinematic UI above these existing contracts. Production release remains Step 6.
 
 See [rules](RULES.md), [API and events](API_EVENTS.md), [deployment](DEPLOYMENT.md), and [decisions](DECISIONS.md).

@@ -11,6 +11,7 @@ import { Button, Skeleton, StatusBanner } from '../../components/index.jsx';
 export default function ResultsList({ history = false }) {
   const api = useApi();
   const userId = useSelector((state) => state.session.user?.id);
+  const scope = history ? userId : 'public';
   const [resource, setResource] = useState({
     loading: true,
     items: [],
@@ -29,18 +30,24 @@ export default function ResultsList({ history = false }) {
         if (active)
           setResource({
             loading: false,
+            scope,
             items: history ? parsed.matches : parsed.players,
             error: null,
           });
       })
       .catch((error) => {
         if (active)
-          setResource({ loading: false, items: [], error: error.message });
+          setResource({
+            scope,
+            loading: false,
+            items: [],
+            error: error.message,
+          });
       });
     return () => {
       active = false;
     };
-  }, [api, userId, history, attempt]);
+  }, [api, userId, history, attempt, scope]);
   if (history && !userId)
     return (
       <p>
@@ -48,7 +55,8 @@ export default function ResultsList({ history = false }) {
       </p>
     );
   if (!api) return <p>No results to show yet.</p>;
-  if (resource.loading) return <Skeleton label="Loading match results" />;
+  if (resource.loading || resource.scope !== scope)
+    return <Skeleton label="Loading match results" />;
   if (resource.error)
     return (
       <StatusBanner

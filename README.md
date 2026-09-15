@@ -1,6 +1,6 @@
 # Mythic Arena
 
-A JavaScript 1v1 card game. Parts 1?4 provide accounts, deck building, practice, authenticated online matchmaking, server-controlled battles, reconnect recovery, and saved match results.
+A JavaScript 1v1 card game. Parts 1-5 provide accounts, deck building, practice, reliable online matches, saved results, and optional cinematic visuals.
 
 ## Run locally
 
@@ -102,3 +102,9 @@ Access tokens stay in memory. Refresh tokens are random, hashed in MongoDB, rota
 See [folder architecture](docs/ARCHITECTURE.md), [deployment](docs/DEPLOYMENT.md), [rules](docs/RULES.md), [decisions](docs/DECISIONS.md), [shared contracts](docs/contracts.md), [account/deck API](docs/part-2-api.md), [Part 1 evidence](docs/part-1-report.md), and [Part 2 evidence](docs/part-2-report.md), and [Step 3 evidence](docs/part-3-report.md).
 
 Step 4 behavior and verification: [online reliability report](docs/part-4-report.md).
+
+## Graphics and Step 5
+
+High graphics adds an original floating 3D arena, skippable match portal, card tilt/reveal, accepted-move sparks and victory crests. Settings offers Low (static artwork), Reduce motion and Mute sound. System reduced motion always takes precedence. Game controls remain available while the optional scene loads or if WebGL is unavailable. Select a card and choose Inspect selected card for the full keyboard/touch detail sheet.
+
+See the [Step 5 report](docs/part-5-report.md), [event-to-animation map](docs/part-5-animation-map.md), and [asset inventory](docs/assets.md).

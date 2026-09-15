@@ -465,7 +465,9 @@ export default function BattleBoard({
         onClose={() => setResultOpen(false)}
         title={outcomeTitle}
       >
-        <VictoryCrest victory={view.outcome?.winnerId === view.self.id} />
+        {!active && resultOpen && (
+          <VictoryCrest victory={view.outcome?.winnerId === view.self.id} />
+        )}
         <p>
           {view.outcome?.reason === 'TURN_LIMIT'
             ? 'The 100-turn limit was reached.'

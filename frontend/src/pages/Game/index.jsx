@@ -8,7 +8,13 @@ import {
   WandSparkles,
   Volume2,
 } from 'lucide-react';
-import { Button, EmptyState, Skeleton, StatusBanner, Toast } from '../../components/index.jsx';
+import {
+  Button,
+  EmptyState,
+  Skeleton,
+  StatusBanner,
+  Toast,
+} from '../../components/index.jsx';
 import { useSelector } from 'react-redux';
 import PageHeading from '../../components/PageHeading.jsx';
 import { lazy, Suspense } from 'react';
@@ -23,7 +29,26 @@ export default function MatchPage() {
         <OnlineMatch />
       </Suspense>
     );
-  if (user) return <div className="page"><h1>Battle arena</h1>{online?.feed.error ? <StatusBanner kind="error" action={<Button onClick={() => window.location.reload()}>Reload connection</Button>}>{online.feed.error.message}</StatusBanner> : <Skeleton label="Restoring online connection" />}</div>;
+  if (user)
+    return (
+      <div className="page">
+        <h1>Battle arena</h1>
+        {online?.feed.error ? (
+          <StatusBanner
+            kind="error"
+            action={
+              <Button onClick={() => window.location.reload()}>
+                Reload connection
+              </Button>
+            }
+          >
+            {online.feed.error.message}
+          </StatusBanner>
+        ) : (
+          <Skeleton label="Restoring online connection" />
+        )}
+      </div>
+    );
   return (
     <div className="page">
       <PageHeading eyebrow="THE BATTLEFIELD" title="Battle arena">

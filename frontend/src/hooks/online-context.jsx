@@ -15,18 +15,29 @@ export function OnlineProvider({ children }) {
     let active = true;
     let client;
     let unsubscribe;
-    void import('../services/socket.js').then(({ createOnlineClient }) => {
-      if (!active) return;
-      client = createOnlineClient({
-        getSession: () => store.getState().session,
-        refreshSession: () => api.bootstrap(),
+    void import('../services/socket.js')
+      .then(({ createOnlineClient }) => {
+        if (!active) return;
+        client = createOnlineClient({
+          getSession: () => store.getState().session,
+          refreshSession: () => api.bootstrap(),
+        });
+        unsubscribe = client.subscribe((feed) => {
+          if (active) setOnline({ client, feed, userId });
+        });
+      })
+      .catch(() => {
+        if (active)
+          setOnline({
+            userId,
+            client: null,
+            feed: {
+              error: {
+                message: 'Online play could not load. Reload to reconnect.',
+              },
+            },
+          });
       });
-      unsubscribe = client.subscribe((feed) => {
-        if (active) setOnline({ client, feed, userId });
-      });
-    }).catch(() => {
-      if (active) setOnline({ userId, client: null, feed: { error: { message: 'Online play could not load. Reload to reconnect.' } } });
-    });
     return () => {
       active = false;
       unsubscribe?.();

@@ -20,6 +20,14 @@ function Arena({ active }) {
   const group = useRef();
   const ring = useRef();
   const lightning = useRef();
+  const bolt = useRef();
+  const boltPoints = useMemo(
+    () =>
+      new Float32Array([
+        -3, 2.8, -1, -2.65, 2.15, -1, -2.9, 1.95, -1, -2.45, 1.25, -1,
+      ]),
+    [],
+  );
   const pointer = useRef({ x: 0, y: 0 });
   const frames = useRef(0);
   const geometry = useMemo(
@@ -77,6 +85,8 @@ function Arena({ active }) {
     // One gentle violet glow every twelve seconds, never a strobe.
     lightning.current.intensity =
       1.1 + Math.pow(Math.max(0, Math.sin((elapsed * Math.PI) / 6)), 30) * 1.2;
+    bolt.current.opacity =
+      Math.pow(Math.max(0, Math.sin((elapsed * Math.PI) / 6)), 30) * 0.45;
   });
   return (
     <>
@@ -99,6 +109,15 @@ function Arena({ active }) {
         fade
         speed={0}
       />
+      <line>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            args={[boltPoints, 3]}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial ref={bolt} color="#c0a1ec" transparent opacity={0} />
+      </line>
       <group ref={group}>
         <mesh position={[0, -0.98, 0]} rotation={[0, Math.PI / 6, Math.PI]}>
           <coneGeometry args={[3, 1.7, 6]} />
@@ -170,24 +189,27 @@ function Arena({ active }) {
 }
 
 export default function ArenaScene({ active, onReady, onFailure }) {
-  const [supported] = useState(() => {
+  const [capability] = useState(() => {
     try {
       const context = document.createElement('canvas').getContext('webgl2');
-      if (!context) return false;
+      if (!context) return { supported: false };
+      const info = context.getExtension('WEBGL_debug_renderer_info');
+      const software =
+        info &&
+        /swiftshader|llvmpipe|software/i.test(
+          context.getParameter(info.UNMASKED_RENDERER_WEBGL),
+        );
       context.getExtension('WEBGL_lose_context')?.loseContext();
-      return true;
+      return { supported: true, software };
     } catch {
-      return false;
+      return { supported: false };
     }
   });
   const cleanup = useRef(() => {});
   useEffect(() => () => cleanup.current(), []);
   const created = useCallback(
-    ({ gl, setDpr }) => {
+    ({ gl }) => {
       const canvas = gl.domElement;
-      const context = gl.getContext();
-      const info = context.getExtension('WEBGL_debug_renderer_info');
-      if (info && /swiftshader|llvmpipe|software/i.test(context.getParameter(info.UNMASKED_RENDERER_WEBGL))) setDpr(.65);
       const lost = (event) => {
         event.preventDefault();
         onFailure();
@@ -199,11 +221,11 @@ export default function ArenaScene({ active, onReady, onFailure }) {
     },
     [onReady, onFailure],
   );
-  if (!supported) return <Failure onFailure={onFailure} />;
+  if (!capability.supported) return <Failure onFailure={onFailure} />;
   return (
     <Canvas
       camera={{ position: [4.8, 4.2, 6.6], fov: 42 }}
-      dpr={[1, 1.25]}
+      dpr={capability.software ? 0.65 : [1, 1.25]}
       frameloop={active ? 'always' : 'never'}
       gl={{ antialias: false, alpha: false, powerPreference: 'low-power' }}
       onCreated={created}

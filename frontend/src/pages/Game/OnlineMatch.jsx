@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { catalogResponseSchema } from '@mythic/shared';
 import { useOnline } from '../../hooks/online-context.jsx';
@@ -43,6 +43,11 @@ export default function OnlineMatch() {
     return () => clearInterval(timer);
   }, []);
   const snapshot = feed.snapshot?.gameId === gameId ? feed.snapshot : null;
+  const serverNow = snapshot?.serverNow;
+  const clockOffset = useMemo(
+    () => (serverNow === undefined ? 0 : serverNow - Date.now()),
+    [serverNow],
+  );
   if (feed.connection === 'conflict')
     return (
       <div className="page">
@@ -110,11 +115,14 @@ export default function OnlineMatch() {
           opponent={snapshot.opponent.displayName}
           gameId={gameId}
         />
-        <div className="content-panel">
+        <div className="content-panel match-readiness">
           <h2>{snapshot.opponent.displayName}</h2>
           <p>
             Both players must be ready. Reservation ends in{' '}
-            {Math.max(0, Math.ceil((snapshot.readyEndsAt - clock) / 1000))}{' '}
+            {Math.max(
+              0,
+              Math.ceil((snapshot.readyEndsAt - clock - clockOffset) / 1000),
+            )}{' '}
             seconds.
           </p>
           <Button

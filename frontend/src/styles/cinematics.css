@@ -111,6 +111,40 @@
   transform-style: preserve-3d;
   transform-origin: center;
 }
+dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+}
+.match-readiness {
+  padding: 24px;
+  line-height: 1.7;
+}
+.match-readiness h2 {
+  font:
+    24px Georgia,
+    serif;
+  margin-bottom: 10px;
+}
+.match-readiness button {
+  margin: 12px 0;
+}
+.results-list {
+  display: grid;
+  gap: 16px;
+}
+.results-list > .content-panel {
+  padding: 22px;
+  line-height: 1.7;
+}
+.results-list h2 {
+  color: #f0d09a;
+  font-size: 22px;
+  margin-bottom: 6px;
+}
 .card-face,
 .hand-card {
   transition: transform 140ms ease;

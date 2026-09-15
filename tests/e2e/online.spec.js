@@ -81,6 +81,21 @@ test('two browsers match, move, reconnect, finish, and see persisted results', a
     await Promise.all(
       [page, beta].map(async (player) => {
         await expect(player).toHaveURL(/\/match\//);
+        if (testInfo.project.name !== 'desktop') {
+          await player
+            .getByRole('button', { name: 'Skip intro', exact: true })
+            .click();
+          await expect(
+            player.getByRole('button', {
+              name: 'Ready to battle',
+              exact: true,
+            }),
+          ).toBeEnabled();
+        }
+        if (player === page)
+          await player.screenshot({
+            path: `docs/evidence/part-5-portal-${testInfo.project.name}.png`,
+          });
         await player
           .getByRole('button', { name: 'Ready to battle', exact: true })
           .click();
@@ -115,6 +130,9 @@ test('two browsers match, move, reconnect, finish, and see persisted results', a
       .click();
     await expect(page.getByText(/Result saved\./)).toBeVisible();
     await expect(beta.getByText(/Result saved\./)).toBeVisible();
+    await beta.screenshot({
+      path: `docs/evidence/part-5-victory-${testInfo.project.name}.png`,
+    });
     await page.goto('/history');
     await expect(
       page.getByRole('heading', { name: 'Defeat', exact: true }),

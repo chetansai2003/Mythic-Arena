@@ -53,7 +53,11 @@ export function createApp({
   app.use(cors({ origin: config.FRONTEND_ORIGINS, credentials: true }));
   app.use(express.json({ limit: '16kb' }));
   app.get('/health/live', (req, res) =>
-    res.json({ status: 'alive', service: 'api' }),
+    res.json({
+      status: 'alive',
+      service: 'api',
+      version: config.RELEASE_VERSION,
+    }),
   );
   app.get('/health/ready', async (req, res) => {
     if (lifecycle.shuttingDown)
@@ -63,7 +67,12 @@ export function createApp({
       status.redis && status.mongo && (!services || (await services.isReady()));
     res
       .status(ready ? 200 : 503)
-      .json({ status: ready ? 'ready' : 'not_ready', dependencies: status });
+      .json({
+        status: ready ? 'ready' : 'not_ready',
+        service: 'api',
+        version: config.RELEASE_VERSION,
+        dependencies: status,
+      });
   });
   if (services) app.use(services.router);
   app.use((req, res) =>

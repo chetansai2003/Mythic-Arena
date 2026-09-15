@@ -1,4 +1,5 @@
 export function createWorkerHandler({
+  config = { RELEASE_VERSION: 'local' },
   dependencies,
   lifecycle = { shuttingDown: false },
 }) {
@@ -10,6 +11,7 @@ export function createWorkerHandler({
         JSON.stringify({
           status: 'alive',
           service: 'worker',
+          version: config.RELEASE_VERSION,
           jobs: 'turns_disconnects_results',
         }),
       );
@@ -23,6 +25,8 @@ export function createWorkerHandler({
         return res.end(
           JSON.stringify({
             status: ready ? 'ready' : 'not_ready',
+            service: 'worker',
+            version: config.RELEASE_VERSION,
             dependencies: status,
           }),
         );

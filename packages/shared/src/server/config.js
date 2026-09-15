@@ -37,6 +37,10 @@ const schema = z.object({
   LOG_LEVEL: z
     .enum(['silent', 'fatal', 'error', 'warn', 'info', 'debug'])
     .default('info'),
+  RELEASE_VERSION: z
+    .string()
+    .regex(/^[a-zA-Z0-9._:-]{1,80}$/)
+    .default('local'),
 });
 export function parseConfig(env) {
   const parsed = schema.safeParse(env);

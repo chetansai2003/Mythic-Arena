@@ -1,6 +1,6 @@
 {
-  "seconds": 3.010199999999255,
-  "renderedFrames": 181,
+  "seconds": 3.3831999999999534,
+  "renderedFrames": 66,
   "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.12 Safari/537.36",
   "viewport": [390, 844],

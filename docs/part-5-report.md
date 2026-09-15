@@ -15,20 +15,24 @@ The renderer declares React >=19 <19.3, so React/ReactDOM were aligned to 19.2.8
 
 ## Verification
 
-| Check                      | Observed result                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `npm run check`            | Lint, formatting, 94 unit/component tests, production build and server/package validation passed        |
-| `npm run test:integration` | 38 passed, including real-service multiplayer concurrency and process crash recovery                    |
-| `npm run test:e2e`         | 43 passed; 2 intentionally skipped duplicate account journeys; maximum-board visual fixture also passed |
-| Optional payload gate      | Arena plus GSAP: 270,602 gzip bytes, below the 5,000,000-byte budget                                    |
+| Check                      | Observed result                                                                                                   |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `npm run check`            | Lint, formatting, 94 unit/component tests, production build and server/package validation passed                  |
+| `npm run test:integration` | 38 passed, including real-service multiplayer concurrency and process crash recovery                              |
+| `npm run test:e2e`         | 43 passed; 2 intentionally skipped duplicate account journeys; maximum-board visual fixture also passed           |
+| Optional payload gate      | Arena plus GSAP: 270,602 gzip bytes, below the 5,000,000-byte budget                                              |
+| Docker Compose             | `docker compose up -d --build --wait` rebuilt `mythic-arena-dev:part5`; API, worker, web, Mongo and Redis healthy |
+| Stack smoke                | Full-stack health, API proxy and deep links passed                                                                |
+| Recovery smoke             | Redis outage dropped readiness to 503 while liveness stayed 200; API and worker recovered automatically           |
+| Direct Compose graphics    | 6 passed across desktop, laptop and phone against the running Compose web app                                     |
 
 Targeted testing exercised complete online matches with Low graphics (desktop), a scene request held pending (laptop), and simulated unavailable WebGL (phone). The graphics journeys exercise context loss, restoration via settings/navigation, reduced motion, hidden-tab pause and keyboard dialog dismissal. No automated accessibility violations were found in the tested shell, deck editor, battle board or card sheet.
 
-Screenshot review found that the stylesheet reset left native dialogs aligned at the top-left. Step 5 explicitly centers them within the viewport, limits their height and adds card-sheet position checks. Readiness and results panels received proper spacing. Final regression totals and local-stack checks are recorded below after those checks finish.
+Screenshot review found that the stylesheet reset left native dialogs aligned at the top-left. Step 5 explicitly centers them within the viewport, limits their height and adds card-sheet position checks. Readiness and results panels received proper spacing. A targeted Playwright run over accounts, online and graphics printed all 15 entries as 13 passed and 2 planned skips, then hung in Windows teardown after the browser-server cleanup path. To avoid relying on that non-clean exit, the final post-style graphics regression was run directly against the healthy Compose app and exited cleanly with 6 passed.
 
 The first scene used many repeated mesh draws and measured about 32 fps under SwiftShader. It was simplified with instancing and software-renderer resolution reduction. No claim of hardware-GPU or physical-phone profiling is made. The available host is Windows, AMD Ryzen 5 5500U, 12 logical processors, approximately 15 GiB RAM; Chromium uses ANGLE SwiftShader. Samples count actual React Three Fiber frames after warm-up, with Playwright tracing disabled to avoid capture overhead.
 
-Final samples were approximately 60 fps at all three viewports, using a 0.65 internal pixel ratio on SwiftShader. Raw samples include frame counts, duration, viewport, browser and renderer: [desktop](evidence/part-5-performance-desktop.json), [laptop](evidence/part-5-performance-laptop.json), [phone](evidence/part-5-performance-phone.json). These are short rendering samples, not long-running load-test results. Low mode uses static artwork and no active 3D render loop.
+Latest clean Compose samples used a 0.65 internal pixel ratio on SwiftShader and recorded 40 frames in 3.12s on desktop, 45 frames in 3.06s on laptop and 66 frames in 3.38s on phone. Raw samples include frame counts, duration, viewport, browser and renderer: [desktop](evidence/part-5-performance-desktop.json), [laptop](evidence/part-5-performance-laptop.json), [phone](evidence/part-5-performance-phone.json). These are short rendering samples from a software renderer, not hardware-GPU or long-running load-test results. Low mode uses static artwork and no active 3D render loop.
 
 ## Screen-state coverage
 

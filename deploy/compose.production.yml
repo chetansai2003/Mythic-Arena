@@ -1,0 +1,86 @@
+name: mythic-arena-prod
+
+x-app: &app
+  image: ${MYTHIC_APP_IMAGE:-mythic-arena:2026.09.15}
+  init: true
+  restart: unless-stopped
+  stop_grace_period: 15s
+
+services:
+  api:
+    <<: *app
+    command: [npm, start, -w, '@mythic/api']
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      API_PORT: 3001
+      REDIS_URL: ${REDIS_URL}
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DB: ${MONGODB_DB:-mythic_arena}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS}
+      AUTH_SECRET: ${AUTH_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      ACCESS_TOKEN_SECONDS: ${ACCESS_TOKEN_SECONDS:-600}
+      REFRESH_DAYS: ${REFRESH_DAYS:-7}
+      RELEASE_VERSION: ${RELEASE_VERSION:-2026.09.15}
+    ports:
+      - '127.0.0.1:3001:3001'
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "Promise.all([fetch('http://127.0.0.1:3001/health/live'), fetch('http://127.0.0.1:3001/health/ready')]).then(([l,r])=>process.exit(l.ok && r.ok ? 0 : 1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  worker:
+    <<: *app
+    command: [npm, start, -w, '@mythic/worker']
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      WORKER_PORT: 3002
+      REDIS_URL: ${REDIS_URL}
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DB: ${MONGODB_DB:-mythic_arena}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      RELEASE_VERSION: ${RELEASE_VERSION:-2026.09.15}
+    ports:
+      - '127.0.0.1:3002:3002'
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "Promise.all([fetch('http://127.0.0.1:3002/health/live'), fetch('http://127.0.0.1:3002/health/ready')]).then(([l,r])=>process.exit(l.ok && r.ok ? 0 : 1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  web:
+    image: ${MYTHIC_WEB_IMAGE:-mythic-arena-web:2026.09.15}
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "fetch('http://127.0.0.1:80').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    # Forwards /socket.io and /api to API upstream defined in infra/nginx.conf

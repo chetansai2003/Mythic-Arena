@@ -99,12 +99,19 @@ Access tokens stay in memory. Refresh tokens are random, hashed in MongoDB, rota
 - Failed deck saves preserve the draft. A revision conflict offers reload or save-a-copy. Browser storage failures still permit in-memory editing, but cannot promise draft recovery after closing the tab.
 - The GitHub workflow is configured, but a remote CI pass exists only after publishing a repository and actually running it. No remote repository or production deployment is created by this implementation.
 
-See [folder architecture](docs/ARCHITECTURE.md), [deployment](docs/DEPLOYMENT.md), [rules](docs/RULES.md), [decisions](docs/DECISIONS.md), [shared contracts](docs/contracts.md), [account/deck API](docs/part-2-api.md), [Part 1 evidence](docs/part-1-report.md), and [Part 2 evidence](docs/part-2-report.md), and [Step 3 evidence](docs/part-3-report.md).
+See [folder architecture](docs/ARCHITECTURE.md), [deployment](docs/DEPLOYMENT.md), [rules](docs/RULES.md), [decisions](docs/DECISIONS.md), [shared contracts](docs/contracts.md), [account/deck API](docs/part-2-api.md), [Part 1 evidence](docs/part-1-report.md), [Part 2 evidence](docs/part-2-report.md), [Step 3 evidence](docs/part-3-report.md), [Step 4 report](docs/part-4-report.md), and [Step 5 report](docs/part-5-report.md).
 
-Step 4 behavior and verification: [online reliability report](docs/part-4-report.md).
+## Release and Step 6
 
-## Graphics and Step 5
+Step 6 delivers release verification, security and confidentiality auditing, load testing, production staging deployment configurations, and operational runbooks:
 
-High graphics adds an original floating 3D arena, skippable match portal, card tilt/reveal, accepted-move sparks and victory crests. Settings offers Low (static artwork), Reduce motion and Mute sound. System reduced motion always takes precedence. Game controls remain available while the optional scene loads or if WebGL is unavailable. Select a card and choose Inspect selected card for the full keyboard/touch detail sheet.
+```sh
+npm run audit:security      # Security, privacy, anti-cheat isolation & bundle secret audit
+npm run preflight:release   # Production configuration, Nginx, and Compose preflight check
+npm run loadtest            # 100 simultaneous players across 50 concurrent matches benchmark
+npm run demo                # Automated 5-minute showcase demo (matchmaking, moves, reconnect, history)
+npm run ops:telemetry       # Live operational metrics (queue, active games, timer lag, outbox backlog)
+npm run ops:drain           # Graceful match draining for zero-downtime rolling maintenance
+```
 
-See the [Step 5 report](docs/part-5-report.md), [event-to-animation map](docs/part-5-animation-map.md), and [asset inventory](docs/assets.md).
+See the [Step 6 release report](docs/part-6-report.md), [Step 6 plan](docs/part-6-plan.md), [operations runbook](docs/RUNBOOK.md), and [production deployment guide](docs/DEPLOYMENT.md).

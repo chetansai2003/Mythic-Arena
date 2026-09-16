@@ -65,14 +65,12 @@ export function createApp({
     const status = await dependencies.check();
     const ready =
       status.redis && status.mongo && (!services || (await services.isReady()));
-    res
-      .status(ready ? 200 : 503)
-      .json({
-        status: ready ? 'ready' : 'not_ready',
-        service: 'api',
-        version: config.RELEASE_VERSION,
-        dependencies: status,
-      });
+    res.status(ready ? 200 : 503).json({
+      status: ready ? 'ready' : 'not_ready',
+      service: 'api',
+      version: config.RELEASE_VERSION,
+      dependencies: status,
+    });
   });
   if (services) app.use(services.router);
   app.use((req, res) =>

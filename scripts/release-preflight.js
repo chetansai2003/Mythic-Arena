@@ -42,8 +42,7 @@ export function productionSampleEnv() {
     MONGODB_DB: 'mythic_arena',
     FRONTEND_ORIGINS: 'https://arena.example.com',
     LOG_LEVEL: 'info',
-    AUTH_SECRET:
-      'release-preflight-only-64-byte-secret-value-for-validation',
+    AUTH_SECRET: 'release-preflight-only-64-byte-secret-value-for-validation',
     ACCESS_TOKEN_SECONDS: '600',
     REFRESH_DAYS: '7',
     RELEASE_VERSION: '2026.09.15',
@@ -132,7 +131,8 @@ export function run(args = process.argv.slice(2), root = process.cwd()) {
     console.log(
       `Production environment preflight passed for ${basename(args[envIndex + 1])}.`,
     );
-  else console.log('Release assets and production configuration sample passed.');
+  else
+    console.log('Release assets and production configuration sample passed.');
 }
 
 if (

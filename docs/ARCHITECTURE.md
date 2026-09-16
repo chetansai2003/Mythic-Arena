@@ -54,6 +54,6 @@ The worker remains a separate process even though its workspace is under `backen
 
 Tailwind 4 is configured through the Vite plugin and CSS theme declarations; a redundant Tailwind JavaScript config is unnecessary. No TypeScript configs or `.ts`/`.tsx` application files are needed.
 
-Parts 1–4 provide the shell, accounts, decks, practice and online matches. Redis holds private live state, controller leases, queue reservations, durable deadline scores, action receipts and the terminal outbox. MongoDB stores active membership and transactionally persists unique match receipts with winner increments. API and worker use the same compare-and-set transitions. Only the API projects private per-player snapshots. Step 5 adds optional lazy 3D and cinematic UI above these existing contracts. Production release remains Step 6.
+Parts 1–4 provide the shell, accounts, decks, practice and online matches. Redis holds private live state, controller leases, queue reservations, durable deadline scores, action receipts and the terminal outbox. MongoDB stores active membership and transactionally persists unique match receipts with winner increments. API and worker use the same compare-and-set transitions. Only the API projects private per-player snapshots. Step 5 adds optional lazy 3D and cinematic UI above these existing contracts. Step 6 hardens verification, audits security and confidentiality, benchmarks load targets, provides production staging deployment manifests, and delivers operational runbooks.
 
-See [rules](RULES.md), [API and events](API_EVENTS.md), [deployment](DEPLOYMENT.md), and [decisions](DECISIONS.md).
+See [rules](RULES.md), [API and events](API_EVENTS.md), [deployment](DEPLOYMENT.md), [runbook](RUNBOOK.md), and [decisions](DECISIONS.md).

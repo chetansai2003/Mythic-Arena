@@ -32,9 +32,17 @@ export function createApiClient(store, fetcher = (...args) => fetch(...args)) {
         credentials: 'include',
         signal: AbortSignal.timeout(10000),
       });
-      const body = await response.json();
-      if (!response.ok || typeof body.csrfToken !== 'string')
-        throw new ApiError(response.status, body);
+      const body = await response.json().catch(() => null);
+      if (!response.ok || typeof body?.csrfToken !== 'string')
+        throw new ApiError(
+          response.status,
+          body || {
+            error: {
+              message:
+                'Backend API service is unreachable. Ensure the backend server is deployed and running.',
+            },
+          },
+        );
       csrfToken = body.csrfToken;
       return csrfToken;
     })().finally(() => {

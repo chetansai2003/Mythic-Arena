@@ -70,7 +70,8 @@ export default function ResultsList({ history = false }) {
         </div>
         <h2>The chronicles await your legend</h2>
         <p className="empty-chronicle-desc">
-          Sign in to preserve your combat records, review turn-by-turn match histories, and join the race for glory on the global leaderboard.
+          Sign in to preserve your combat records, review turn-by-turn match
+          histories, and join the race for glory on the global leaderboard.
         </p>
         <div className="empty-chronicle-actions">
           <Link
@@ -94,21 +95,30 @@ export default function ResultsList({ history = false }) {
               <Swords size={18} />
             </div>
             <h4>Preserved Records</h4>
-            <p>Every match outcome, opponent, and turn count is saved permanently to your profile.</p>
+            <p>
+              Every match outcome, opponent, and turn count is saved permanently
+              to your profile.
+            </p>
           </div>
           <div className="chronicle-feature-card">
             <div className="feature-icon violet">
               <Crown size={18} />
             </div>
             <h4>Hall of Legends</h4>
-            <p>Compete on an even playing field for the top spots in the realm’s Hall of Legends.</p>
+            <p>
+              Compete on an even playing field for the top spots in the realm’s
+              Hall of Legends.
+            </p>
           </div>
           <div className="chronicle-feature-card">
             <div className="feature-icon cyan">
               <Sparkles size={18} />
             </div>
             <h4>Full Deck Library</h4>
-            <p>All twenty original mythic cards are immediately available to every registered player.</p>
+            <p>
+              All twenty original mythic cards are immediately available to
+              every registered player.
+            </p>
           </div>
         </div>
       </div>
@@ -124,9 +134,7 @@ export default function ResultsList({ history = false }) {
           </div>
         </div>
         <h2>No results available yet</h2>
-        <p className="empty-chronicle-desc">
-          Connecting to arena services...
-        </p>
+        <p className="empty-chronicle-desc">Connecting to arena services...</p>
       </div>
     );
   }
@@ -134,7 +142,11 @@ export default function ResultsList({ history = false }) {
   if (resource.loading || resource.scope !== scope) {
     return (
       <div className="content-panel skeleton-panel">
-        <Skeleton label={history ? 'Loading match history' : 'Loading leaderboard standings'} />
+        <Skeleton
+          label={
+            history ? 'Loading match history' : 'Loading leaderboard standings'
+          }
+        />
       </div>
     );
   }
@@ -155,10 +167,14 @@ export default function ResultsList({ history = false }) {
   const items = resource.items || [];
   const total = items.length;
   const wins = history
-    ? items.filter((m) => m.outcome.kind === 'WIN' && m.outcome.winnerId === userId).length
+    ? items.filter(
+        (m) => m.outcome.kind === 'WIN' && m.outcome.winnerId === userId,
+      ).length
     : 0;
   const defeats = history
-    ? items.filter((m) => m.outcome.kind === 'WIN' && m.outcome.winnerId !== userId).length
+    ? items.filter(
+        (m) => m.outcome.kind === 'WIN' && m.outcome.winnerId !== userId,
+      ).length
     : 0;
   const winRate = total > 0 ? `${Math.round((wins / total) * 100)}%` : '—';
 
@@ -228,7 +244,9 @@ export default function ResultsList({ history = false }) {
       {total === 0 ? (
         <div className="content-panel empty-chronicle-card">
           <div className="empty-chronicle-emblem">
-            <div className={`emblem-glow ${history ? 'amber-glow' : 'gold-glow'}`} />
+            <div
+              className={`emblem-glow ${history ? 'amber-glow' : 'gold-glow'}`}
+            />
             <div className={`emblem-icon ${history ? 'amber' : 'gold'}`}>
               {history ? <Swords size={32} /> : <Crown size={32} />}
             </div>
@@ -245,7 +263,8 @@ export default function ResultsList({ history = false }) {
           </p>
           <div className="empty-chronicle-actions">
             <Link to="/lobby" className="button button-primary">
-              {history ? 'Enter the arena' : 'Claim Rank #1'} <ArrowRight size={16} />
+              {history ? 'Enter the arena' : 'Claim Rank #1'}{' '}
+              <ArrowRight size={16} />
             </Link>
             {history && (
               <Link to="/practice" className="button button-secondary">
@@ -295,7 +314,8 @@ export default function ResultsList({ history = false }) {
           {items.map((entry, index) => {
             if (history) {
               const isWinner =
-                entry.outcome.kind === 'WIN' && entry.outcome.winnerId === userId;
+                entry.outcome.kind === 'WIN' &&
+                entry.outcome.winnerId === userId;
               const isDraw = entry.outcome.kind === 'DRAW';
               const opponent =
                 entry.players?.find((p) => p.id !== userId)?.displayName ||

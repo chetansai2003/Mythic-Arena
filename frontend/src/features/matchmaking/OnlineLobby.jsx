@@ -1,11 +1,21 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useOnline } from '../../hooks/online-context.jsx';
 import { Button, StatusBanner } from '../../components/index.jsx';
 
 export default function OnlineLobby({ deckId }) {
   const online = useOnline();
+  const location = useLocation();
   const navigate = useNavigate();
+  const panelRef = useRef(null);
+  const [highlighted, setHighlighted] = useState(false);
+  const openQueue = useCallback(() => {
+    panelRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    panelRef.current
+      ?.querySelector('button:not(:disabled)')
+      ?.focus({ preventScroll: true });
+    setHighlighted(true);
+  }, []);
   const found =
     online?.feed.found?.gameId ??
     (['INITIALIZING', 'ACTIVE'].includes(online?.feed.snapshot?.status)
@@ -14,6 +24,20 @@ export default function OnlineLobby({ deckId }) {
   useEffect(() => {
     if (found) navigate(`/match/${found}`);
   }, [found, navigate]);
+  useEffect(() => {
+    if (location.hash !== '#online-queue') return;
+    openQueue();
+  }, [location.hash, openQueue]);
+  useEffect(() => {
+    window.addEventListener('mythic:open-online-queue', openQueue);
+    return () =>
+      window.removeEventListener('mythic:open-online-queue', openQueue);
+  }, [openQueue]);
+  useEffect(() => {
+    if (!highlighted) return;
+    const timer = setTimeout(() => setHighlighted(false), 1600);
+    return () => clearTimeout(timer);
+  }, [highlighted]);
   if (!online) return <p role="status">Connecting to online play…</p>;
   const { client, feed } = online;
   if (!client)
@@ -43,7 +67,12 @@ export default function OnlineLobby({ deckId }) {
       </StatusBanner>
     );
   return (
-    <div id="online-queue" className="online-queue">
+    <div
+      id="online-queue"
+      ref={panelRef}
+      className={`online-queue ${highlighted ? 'is-highlighted' : ''}`}
+      aria-label="Casual battle matchmaking"
+    >
       {feed.error && (
         <StatusBanner
           kind="error"

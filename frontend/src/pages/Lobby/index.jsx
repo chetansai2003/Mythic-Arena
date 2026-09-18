@@ -135,7 +135,13 @@ export default function Lobby({ home = false }) {
               A worthy opponent. A fresh strategy.
               <br /> Your next story starts across the board.
             </p>
-            <a className="mode-action" href="#online-queue">
+            <a
+              className="mode-action"
+              href="#online-queue"
+              onClick={() =>
+                window.dispatchEvent(new Event('mythic:open-online-queue'))
+              }
+            >
               <Swords size={14} /> Choose a deck to find an opponent{' '}
               <ArrowRight size={16} />
             </a>

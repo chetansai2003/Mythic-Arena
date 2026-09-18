@@ -43,7 +43,14 @@ export function createOnlineClient({
     state = { ...state, events: [], ...patch };
     for (const listener of listeners) listener(state);
   };
-  const socket = socketFactory({
+  const serverUrl =
+    import.meta.env?.VITE_SOCKET_URL ||
+    (typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+      ? 'https://mythic-arena.onrender.com'
+      : undefined);
+  const options = {
     autoConnect: false,
     forceNew: true,
     // Browser WebSocket handshakes always carry Origin, including same-origin
@@ -57,7 +64,10 @@ export function createOnlineClient({
         clientId,
         takeover,
       }),
-  });
+  };
+  const socket = serverUrl
+    ? socketFactory(serverUrl, options)
+    : socketFactory(options);
   function fail(error, connection = 'rejected') {
     publish({
       connection,

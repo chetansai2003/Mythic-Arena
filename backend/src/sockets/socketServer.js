@@ -46,8 +46,13 @@ export function attachSocketServer({
   const io = new Server(server, {
     maxHttpBufferSize: 16384,
     cors: { origin: config.FRONTEND_ORIGINS, credentials: true },
-    allowRequest: (req, callback) =>
-      callback(null, config.FRONTEND_ORIGINS.includes(req.headers.origin)),
+    allowRequest: (req, callback) => {
+      const origin = req.headers.origin?.replace(/\/+$/, '');
+      const allowed = config.FRONTEND_ORIGINS.some(
+        (o) => o.replace(/\/+$/, '') === origin,
+      );
+      callback(null, allowed);
+    },
   });
   let stopping = false;
   const disconnects = new Set();

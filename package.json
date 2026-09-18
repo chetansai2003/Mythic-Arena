@@ -18,6 +18,11 @@
   "scripts": {
     "dev": "concurrently --kill-others -n web,api,worker \"npm run dev -w @mythic/web\" \"npm run dev -w @mythic/api\" \"npm run dev -w @mythic/worker\"",
     "dev:web": "npm run dev -w @mythic/web",
+    "dev:frontend": "npm run dev -w @mythic/web",
+    "dev:api": "npm run dev -w @mythic/api",
+    "dev:backend": "npm run dev -w @mythic/api",
+    "dev:worker": "npm run dev -w @mythic/worker",
+    "dev:deps": "docker compose -f docker-compose.yml up -d --wait redis mongo mongo-init",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

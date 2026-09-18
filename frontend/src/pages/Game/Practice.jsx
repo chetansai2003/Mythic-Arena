@@ -99,7 +99,8 @@ export default function Practice() {
   return (
     <div className="page practice-page">
       <PageHeading eyebrow="LEARN YOUR LEGENDS" title="Practice grounds">
-        A quiet sanctuary to test card synergies and sharpen tactical foresight against the arena apprentice.
+        A quiet sanctuary to test card synergies and sharpen tactical foresight
+        against the arena apprentice.
       </PageHeading>
 
       <div className="practice-setup-container">
@@ -112,13 +113,16 @@ export default function Practice() {
             </div>
             <div className="combatant-info">
               <span className="combatant-label">YOUR HERO</span>
-              <h2 className="combatant-name">{user?.displayName || 'Challenger'}</h2>
+              <h2 className="combatant-name">
+                {user?.displayName || 'Challenger'}
+              </h2>
               <div className="combatant-meta">
                 <span className="hp-badge">
                   <Heart size={12} /> 20 HP
                 </span>
                 <span className="deck-badge">
-                  <Layers3 size={12} /> {load.deckName || 'Balanced Starter Deck'}
+                  <Layers3 size={12} />{' '}
+                  {load.deckName || 'Balanced Starter Deck'}
                 </span>
               </div>
             </div>
@@ -161,7 +165,8 @@ export default function Practice() {
             </div>
             <h3>Hero Elimination</h3>
             <p>
-              Both heroes start with 20 HP. Summon units, cast spells, and reduce the opposing apprentice to zero to claim victory.
+              Both heroes start with 20 HP. Summon units, cast spells, and
+              reduce the opposing apprentice to zero to claim victory.
             </p>
           </div>
 
@@ -171,7 +176,8 @@ export default function Practice() {
             </div>
             <h3>Turn Flow & Timing</h3>
             <p>
-              Rounds alternate with 30-second timers. Newly summoned units prepare for 1 turn before they can strike the board.
+              Rounds alternate with 30-second timers. Newly summoned units
+              prepare for 1 turn before they can strike the board.
             </p>
           </div>
 
@@ -181,7 +187,8 @@ export default function Practice() {
             </div>
             <h3>Guard & Shielding</h3>
             <p>
-              Guard units force enemies to attack them first. Shield keywords absorb the next incoming damage instance entirely.
+              Guard units force enemies to attack them first. Shield keywords
+              absorb the next incoming damage instance entirely.
             </p>
           </div>
 
@@ -191,7 +198,8 @@ export default function Practice() {
             </div>
             <h3>Sandbox Freedom</h3>
             <p>
-              Practice runs completely in this tab. Explore complex synergies and experimental card plays with no risk to your record.
+              Practice runs completely in this tab. Explore complex synergies
+              and experimental card plays with no risk to your record.
             </p>
           </div>
         </div>

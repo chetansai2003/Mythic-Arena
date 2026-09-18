@@ -32,10 +32,12 @@ try {
     },
   });
 } catch (error) {
-  console.error(
-    error.message.startsWith('Invalid environment fields:')
-      ? error.message
-      : 'API startup failed; check service configuration and port availability',
-  );
+  if (error.message.startsWith('Invalid environment fields:'))
+    console.error(error.message);
+  else if (error.code === 'EADDRINUSE')
+    console.error(
+      `API startup failed: ${error.address ?? 'configured host'}:${error.port} is already in use. Stop the existing API process or choose another API_PORT.`,
+    );
+  else console.error(`API startup failed: ${error.message}`);
   process.exitCode = 1;
 }

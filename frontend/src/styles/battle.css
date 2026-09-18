@@ -15,7 +15,11 @@
   align-items: center;
   gap: 24px;
   padding: 28px 32px;
-  background: radial-gradient(circle at 50% 20%, rgba(44, 36, 61, 0.4) 0%, rgba(18, 27, 40, 0.95) 75%);
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(44, 36, 61, 0.4) 0%,
+    rgba(18, 27, 40, 0.95) 75%
+  );
   border: 1px solid rgba(184, 153, 96, 0.25);
   border-radius: 14px;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
@@ -138,14 +142,20 @@
   gap: 16px;
 }
 .briefing-card {
-  background: linear-gradient(135deg, rgba(21, 29, 42, 0.8), rgba(16, 22, 34, 0.95));
+  background: linear-gradient(
+    135deg,
+    rgba(21, 29, 42, 0.8),
+    rgba(16, 22, 34, 0.95)
+  );
   border: 1px solid rgba(184, 153, 96, 0.18);
   border-radius: 12px;
   padding: 20px 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 .briefing-card:hover {
   transform: translateY(-2px);

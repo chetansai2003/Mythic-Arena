@@ -39,12 +39,33 @@ Ordinary shutdown preserves data volumes. Adding `--volumes` erases this project
 ```sh
 npm ci
 npm run setup
-docker compose -f docker-compose.yml up -d --wait redis mongo mongo-init
+npm run dev:deps
 npm run db:setup
+```
+
+Then use separate terminals so each service has its own logs:
+
+```sh
+npm run dev:frontend
+```
+
+```sh
+npm run dev:backend
+```
+
+```sh
+npm run dev:worker
+```
+
+`dev:backend` is an alias for `dev:api`; use whichever name is easier to remember. The frontend runs on port 5173, the API on 3001, and the worker health server on 3002. If one of those commands says the port is unavailable, that service is already running in another terminal or process. Use the existing process, or stop it before starting a new one.
+
+The old combined command still exists:
+
+```sh
 npm run dev
 ```
 
-If the full Compose application already runs, free its app ports first with `docker compose -f docker-compose.yml stop web api worker`. Keep the dependency containers running. `npm run dev:web` starts only the frontend and reports service unavailability honestly.
+Use it only when you want one terminal to own frontend, API, and worker together. If the full Compose application already runs, free its app ports first with `docker compose -f docker-compose.yml stop web api worker`. Keep the dependency containers running.
 
 The host MongoDB URI uses `directConnection=true` because the single replica-set member advertises its Docker hostname (`mongo:27017`). Host processes connect to 127.0.0.1:27018; container processes use the Docker hostname. Do not reuse this single-node development topology as a production design.
 

@@ -15,7 +15,7 @@ try {
   console.error(
     error.message.startsWith('Invalid environment fields:')
       ? error.message
-      : 'Database setup failed. Check connectivity, replica-set readiness, and immutable catalog definitions.',
+      : `Database setup failed: ${error.message}. Check connectivity, replica-set readiness, and immutable catalog definitions.`,
   );
   process.exitCode = 1;
 } finally {

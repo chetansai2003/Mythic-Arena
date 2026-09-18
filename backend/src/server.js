@@ -16,6 +16,7 @@ try {
     handlerFactory: async (context) => {
       services = await createApiServices({
         config,
+        logger,
         dependencies: context.dependencies,
         onSessionRevoked: (familyId) => sockets?.revoke(familyId),
       });

@@ -11,10 +11,12 @@ import {
 import { createDeckService } from '../services/deckService.js';
 import { HttpError } from '../utils/errors.js';
 import { createGameService } from '../services/realtime/gameService.js';
+import { setupDatabase } from '../models/database.js';
 
 export async function createApiServices({
   config,
   dependencies,
+  logger = console,
   now = Date.now,
   onSessionRevoked,
 }) {
@@ -31,16 +33,29 @@ export async function createApiServices({
   const cookies = createCookieSecurity(config, now);
   const limit = createRateLimit(dependencies.redis, config.RATE_LIMIT_PREFIX);
   const router = Router();
+  let settingUp = null;
   async function isReady() {
     try {
-      return (
-        (await db.collection('metadata').findOne({ _id: 'schema' }))
-          ?.version === 3
-      );
+      const meta = await db.collection('metadata').findOne({ _id: 'schema' });
+      if (meta?.version === 3) return true;
+      if (!settingUp) {
+        settingUp = setupDatabase(db)
+          .catch((err) => {
+            (logger.warn ? logger.warn({ err: err.message }, 'Database auto-initialization failed') : console.warn('Database auto-initialization failed:', err.message));
+            throw err;
+          })
+          .finally(() => {
+            settingUp = null;
+          });
+      }
+      await settingUp;
+      const updated = await db.collection('metadata').findOne({ _id: 'schema' });
+      return updated?.version === 3;
     } catch {
       return false;
     }
   }
+  void isReady();
   router.use(async (_req, _res, next) => {
     if (!(await isReady()))
       return next(

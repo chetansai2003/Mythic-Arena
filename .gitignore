@@ -9,3 +9,5 @@ playwright-report/
 .local/
 *.log
 .DS_Store
+*.docx
+*.pdf

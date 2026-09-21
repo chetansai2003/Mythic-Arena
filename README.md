@@ -1,6 +1,6 @@
 # Mythic Arena
 
-A JavaScript 1v1 card game. Parts 1-5 provide accounts, deck building, practice, reliable online matches, saved results, and optional cinematic visuals.
+A JavaScript 1v1 card game with accounts, deck building, practice, reliable online matches, saved results, optional cinematic visuals, and release-preflight tooling.
 
 ## Run locally
 
@@ -101,6 +101,7 @@ backend/                          Express API, identity and deck persistence
 backend/src/workers/              Separate worker process
 backend/src/services/gameEngine/  Deterministic engine and practice bot
 packages/shared/                  Runtime contracts and server utilities
+deploy/                           Production Compose template
 infra/                            App image and replica-set initialization
 docker-compose.yml                Full local development stack
 scripts/                          Setup, validation and recovery tools
@@ -119,12 +120,11 @@ Access tokens stay in memory. Refresh tokens are random, hashed in MongoDB, rota
 - Refresh-token reuse ends the session; sign in again. Use independent private windows or browser profiles to test different accounts simultaneously.
 - Failed deck saves preserve the draft. A revision conflict offers reload or save-a-copy. Browser storage failures still permit in-memory editing, but cannot promise draft recovery after closing the tab.
 - The GitHub workflow is configured, but a remote CI pass exists only after publishing a repository and actually running it. No remote repository or production deployment is created by this implementation.
-
-See [folder architecture](docs/ARCHITECTURE.md), [deployment](docs/DEPLOYMENT.md), [rules](docs/RULES.md), [decisions](docs/DECISIONS.md), [shared contracts](docs/contracts.md), [account/deck API](docs/part-2-api.md), [Part 1 evidence](docs/part-1-report.md), [Part 2 evidence](docs/part-2-report.md), [Step 3 evidence](docs/part-3-report.md), [Step 4 report](docs/part-4-report.md), and [Step 5 report](docs/part-5-report.md).
+- Local `docs/` and screenshot evidence are ignored and are not part of the GitHub repository.
 
 ## Release and Step 6
 
-Step 6 delivers release verification, security and confidentiality auditing, load testing, production staging deployment configurations, and operational runbooks:
+Release tooling covers security and confidentiality auditing, production configuration preflight, local load checks, demo automation, telemetry, and drain commands:
 
 ```sh
 npm run audit:security      # Security, privacy, anti-cheat isolation & bundle secret audit
@@ -135,4 +135,4 @@ npm run ops:telemetry       # Live operational metrics (queue, active games, tim
 npm run ops:drain           # Graceful match draining for zero-downtime rolling maintenance
 ```
 
-See the [Step 6 release report](docs/part-6-report.md), [Step 6 plan](docs/part-6-plan.md), [operations runbook](docs/RUNBOOK.md), and [production deployment guide](docs/DEPLOYMENT.md).
+Production configuration starts from `.env.production.example`, `deploy/compose.production.yml`, `infra/Dockerfile.web`, and `infra/nginx.conf`. Real `.env`, `.env.production`, generated reports, screenshots, local docs, and build outputs stay ignored.

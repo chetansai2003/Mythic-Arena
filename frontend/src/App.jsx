@@ -48,7 +48,6 @@ const navigation = [
   { to: '/decks', label: 'My decks', icon: Layers3 },
   { to: '/history', label: 'Match history', icon: History },
   { to: '/leaderboard', label: 'Leaderboard', icon: Trophy },
-  { to: '/how-to-play', label: 'How to play', icon: CircleHelp },
 ];
 export function Layout() {
   const [rulesOpen, setRulesOpen] = useState(false);

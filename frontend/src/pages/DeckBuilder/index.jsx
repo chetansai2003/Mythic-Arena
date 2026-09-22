@@ -672,6 +672,33 @@ function DeckEditor() {
               ? 'Use the starter list?'
               : 'Discard unsaved changes?'
         }
+        action={
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => setConfirm(null)}
+              disabled={pending}
+            >
+              Keep editing
+            </Button>
+            <Button
+              onClick={() => {
+                if (confirm.type === 'delete') return deleteDeck();
+                if (confirm.type === 'starter') return starter();
+                if (confirm.type === 'reload') return reloadSaved();
+                choose(confirm.next);
+                setConfirm(null);
+              }}
+              disabled={pending}
+            >
+              {confirm?.type === 'delete'
+                ? 'Delete deck'
+                : confirm?.type === 'starter'
+                  ? 'Use starter list'
+                  : 'Discard changes'}
+            </Button>
+          </>
+        }
       >
         <p>
           {confirm?.type === 'delete'
@@ -680,49 +707,26 @@ function DeckEditor() {
               ? 'Replace the current card list with a balanced starting point of 30 cards. You can edit it before saving.'
               : 'Your current unsaved edits will be replaced. Save a copy first if you want to keep them.'}
         </p>
-        <div className="dialog-actions">
-          <Button
-            variant="secondary"
-            onClick={() => setConfirm(null)}
-            disabled={pending}
-          >
-            Keep editing
-          </Button>
-          <Button
-            onClick={() => {
-              if (confirm.type === 'delete') return deleteDeck();
-              if (confirm.type === 'starter') return starter();
-              if (confirm.type === 'reload') return reloadSaved();
-              choose(confirm.next);
-              setConfirm(null);
-            }}
-            disabled={pending}
-          >
-            {confirm?.type === 'delete'
-              ? 'Delete deck'
-              : confirm?.type === 'starter'
-                ? 'Use starter list'
-                : 'Discard changes'}
-          </Button>
-        </div>
       </Dialog>
       <Dialog
         open={blocker.state === 'blocked'}
         onClose={() => blocker.reset?.()}
         title="Leave your unsaved deck?"
+        action={
+          <>
+            <Button variant="secondary" onClick={() => blocker.reset?.()}>
+              Keep editing
+            </Button>
+            <Button onClick={() => blocker.proceed?.()}>
+              Leave page <ArrowRight size={15} />
+            </Button>
+          </>
+        }
       >
         <p>
           Your unsaved draft is kept on this tab where browser storage is
           available. Stay here to save it before leaving.
         </p>
-        <div className="dialog-actions">
-          <Button variant="secondary" onClick={() => blocker.reset?.()}>
-            Keep editing
-          </Button>
-          <Button onClick={() => blocker.proceed?.()}>
-            Leave page <ArrowRight size={15} />
-          </Button>
-        </div>
       </Dialog>
     </>
   );

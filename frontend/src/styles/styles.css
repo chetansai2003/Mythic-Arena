@@ -508,6 +508,13 @@ h1 {
   box-shadow: none;
   border-color: #3f4350;
 }
+.button + .button,
+.button + a.button,
+a.button + .button,
+a.button + a.button,
+button.button + button.button {
+  margin-left: 12px;
+}
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -1052,6 +1059,33 @@ dialog p,
   font-size: 13px;
   line-height: 1.9;
   color: #bdc8d9;
+}
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+dialog .dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+dialog > .button,
+dialog > button:not(.icon-button),
+dialog > a.button {
+  margin-right: 14px;
+  margin-top: 14px;
+}
+dialog .dialog-actions > .button,
+dialog .dialog-actions > button:not(.icon-button),
+dialog .dialog-actions > a.button {
+  margin-right: 0;
+  margin-top: 0;
+  margin-left: 0;
 }
 .rules-list {
   padding-left: 20px;

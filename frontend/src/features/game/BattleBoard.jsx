@@ -442,28 +442,43 @@ export default function BattleBoard({
         title={
           online ? 'Surrender this match?' : 'Surrender this practice match?'
         }
+        action={
+          <>
+            <Button variant="secondary" onClick={() => setSurrender(false)}>
+              Keep playing
+            </Button>
+            <Button
+              onClick={() => {
+                setSurrender(false);
+                submit({ type: 'SURRENDER', payload: {} });
+              }}
+            >
+              Confirm surrender
+            </Button>
+          </>
+        }
       >
         <p>
           {online
             ? 'Your opponent will win this casual match.'
             : 'The apprentice wins this practice. Your saved decks and account record stay unchanged.'}
         </p>
-        <Button variant="secondary" onClick={() => setSurrender(false)}>
-          Keep playing
-        </Button>
-        <Button
-          onClick={() => {
-            setSurrender(false);
-            submit({ type: 'SURRENDER', payload: {} });
-          }}
-        >
-          Confirm surrender
-        </Button>
       </Dialog>
       <Dialog
         open={!active && resultOpen}
         onClose={() => setResultOpen(false)}
         title={outcomeTitle}
+        action={
+          <>
+            {!online && <Button onClick={onRestart}>Practice again</Button>}
+            <Link className="button button-secondary" to="/lobby">
+              Return to lobby
+            </Link>
+            <Button variant="secondary" onClick={() => setResultOpen(false)}>
+              Got it
+            </Button>
+          </>
+        }
       >
         {!active && resultOpen && (
           <VictoryCrest victory={view.outcome?.winnerId === view.self.id} />
@@ -486,10 +501,6 @@ export default function BattleBoard({
               : 'Saving result. It will appear in history when storage is available.'
             : 'This was a practice match. No leaderboard points were awarded.'}
         </p>
-        {!online && <Button onClick={onRestart}>Practice again</Button>}
-        <Link className="button button-secondary" to="/lobby">
-          Return to lobby
-        </Link>
       </Dialog>
       {!active && !resultOpen && (
         <Button onClick={() => setResultOpen(true)}>View result</Button>

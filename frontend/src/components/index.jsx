@@ -13,7 +13,7 @@ export function Button({
     </button>
   );
 }
-export function Dialog({ open, onClose, title, children }) {
+export function Dialog({ open, onClose, title, action, children }) {
   const titleId = useId();
   const ref = useRef(null);
   const closeRef = useRef(onClose);
@@ -72,10 +72,16 @@ export function Dialog({ open, onClose, title, children }) {
           <X size={20} />
         </button>
       </div>
-      {children}
-      <Button variant="secondary" onClick={onClose}>
-        Got it
-      </Button>
+      <div className="dialog-body">{children}</div>
+      {action !== undefined ? (
+        action && <div className="dialog-actions">{action}</div>
+      ) : (
+        <div className="dialog-actions">
+          <Button variant="secondary" onClick={onClose}>
+            Got it
+          </Button>
+        </div>
+      )}
     </dialog>
   );
 }

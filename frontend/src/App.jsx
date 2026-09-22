@@ -48,6 +48,7 @@ const navigation = [
   { to: '/decks', label: 'My decks', icon: Layers3 },
   { to: '/history', label: 'Match history', icon: History },
   { to: '/leaderboard', label: 'Leaderboard', icon: Trophy },
+  { to: '/how-to-play', label: 'How to play', icon: CircleHelp },
 ];
 export function Layout() {
   const [rulesOpen, setRulesOpen] = useState(false);
@@ -115,14 +116,24 @@ export function Layout() {
             <p>A new world of myth and strategy is taking shape.</p>
             <span className="small-tag">COLLECTION PREVIEW</span>
           </div>
-          <NavLink className="nav-link" to="/settings">
+          <NavLink
+            className={({ isActive }) =>
+              `nav-link ${isActive ? 'active' : ''}`
+            }
+            to="/settings"
+          >
             <Settings2 size={19} />
-            Settings
+            <span>Settings</span>
           </NavLink>
-          <button className="nav-link" onClick={() => setRulesOpen(true)}>
+          <NavLink
+            className={({ isActive }) =>
+              `nav-link ${isActive ? 'active' : ''}`
+            }
+            to="/how-to-play"
+          >
             <CircleHelp size={19} />
-            How to play
-          </button>
+            <span>How to play</span>
+          </NavLink>
           <div className="sidebar-footer">
             <span className="status-dot" />
             VERSION 0.5
@@ -136,9 +147,15 @@ export function Layout() {
             <span>
               {location.pathname === '/'
                 ? 'Welcome'
+                : location.pathname === '/how-to-play' ||
+                  location.pathname === '/rules'
+                ? 'How to play'
                 : location.pathname
                     .split('/')[1]
-                    .replace('leaderboard', 'Leaderboard')}
+                    .replace('leaderboard', 'Leaderboard')
+                    .replace('decks', 'My decks')
+                    .replace('history', 'Match history')
+                    .replace('settings', 'Settings')}
             </span>
           </div>
           <div className="topbar-actions">

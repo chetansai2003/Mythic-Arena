@@ -10,6 +10,7 @@ import SettingsPage from './pages/Settings/index.jsx';
 import Login from './pages/Login/index.jsx';
 import Register from './pages/Register/index.jsx';
 import DeckBuilderPage from './pages/DeckBuilder/index.jsx';
+import HowToPlay from './pages/HowToPlay/index.jsx';
 export const routes = [
   {
     element: <Layout />,
@@ -32,6 +33,8 @@ export const routes = [
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
       { path: '/settings', element: <SettingsPage /> },
+      { path: '/how-to-play', element: <HowToPlay /> },
+      { path: '/rules', element: <HowToPlay /> },
       { path: '*', element: <NotFound /> },
     ],
   },

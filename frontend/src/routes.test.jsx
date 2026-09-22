@@ -25,6 +25,7 @@ describe('route shell', () => {
     ['/login', 'Welcome back'],
     ['/register', 'Create an account'],
     ['/settings', 'Settings'],
+    ['/how-to-play', 'How to Play Mythic Arena'],
     ['/unknown', 'A path yet undiscovered'],
   ])('renders %s', (path, title) => {
     renderRoute(path);
